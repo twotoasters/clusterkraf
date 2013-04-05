@@ -33,6 +33,10 @@ public class ClusterPoint extends BasePoint {
 		pointsInClusterSet.add(point);
 	}
 	
+	ArrayList<InputPoint> getPointsInCluster() {
+		return pointsInClusterList;
+	}
+	
 	public int size() {
 		return pointsInClusterList.size();
 	}

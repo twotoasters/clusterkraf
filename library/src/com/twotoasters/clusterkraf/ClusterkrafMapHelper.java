@@ -3,12 +3,20 @@
  */
 package com.twotoasters.clusterkraf;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.Marker;
 
 public class ClusterkrafMapHelper {
 	
 	private GoogleMap map;
 	private final Options options;
+	private final ArrayList<InputPoint> points = new ArrayList<InputPoint>();
+	private final ArrayList<Marker> markers = new ArrayList<Marker>();
+	private final HashMap<Marker, ClusterPoint> clusterPointsByMarker = new HashMap<Marker, ClusterPoint>();
 	
 	/**
 	 * construct a Clusterkraf instance to manage your map with customized options.
@@ -30,17 +38,26 @@ public class ClusterkrafMapHelper {
 		this(map, new Options());
 	}
 	
-	/**
-	 * specify options for the clusterkraf instance
-	 */
-	public static class Options {
-		
-		private static final int DEFAULT_TRANSITION_DURATION = 300;
-		private int transitionDuration = DEFAULT_TRANSITION_DURATION;
-		
-		private int pixelDistanceToJoinCluster;
-		
-		
+	public void add(InputPoint inputPoint) {
+		points.add(inputPoint);
+	}
+	
+	public void addAll(ArrayList<InputPoint> inputPoints) {
+		points.addAll(inputPoints);
+	}
+	
+	public void replace(ArrayList<InputPoint> inputPoints) {
+		clear();
+		points.addAll(inputPoints);
+	}
+	
+	private void clear() {
+		for (Marker marker : markers) {
+			marker.remove();
+		}
+		points.clear();
+		markers.clear();
+		clusterPointsByMarker.clear();
 	}
 	
 }
