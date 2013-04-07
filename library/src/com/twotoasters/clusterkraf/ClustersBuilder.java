@@ -40,9 +40,7 @@ class ClustersBuilder {
 	private void addRelevantInitialInputPoints(ArrayList<ClusterPoint> initialClusteredPoints) {
 		for(ClusterPoint clusterPoint : initialClusteredPoints) {
 			clusterPoint.clearScreenPosition();
-			for(InputPoint point : clusterPoint.getPointsInCluster()) {
-				add(point);
-			}
+			addAll(clusterPoint.getPointsInCluster());
 		}
 	}
 
@@ -54,18 +52,24 @@ class ClustersBuilder {
 		return visibleRegionRef.get();
 	}
 
-	void add(InputPoint point) {
-		if(point != null) {
+	void addAll(ArrayList<InputPoint> points) {
+		if(points != null) {
 			Projection projection = getProjection();
 			VisibleRegion visibleRegion = getVisibleRegion();
-			if(visibleRegion != null) {
+			if(projection != null && visibleRegion != null) {
 				LatLngBounds bounds = visibleRegion.latLngBounds;
-				if(bounds != null && bounds.contains(point.getMapPosition()) && !releventInputPointsSet.contains(point)) {
-					point.buildScreenPosition(projection);
-					relevantInputPointsList.add(point);
-					releventInputPointsSet.add(point);
+				for(InputPoint point : points) {
+					addIfNecessary(point, projection, bounds);
 				}
 			}
+		}
+	}
+
+	private void addIfNecessary(InputPoint point, Projection projection, LatLngBounds bounds) {
+		if(bounds != null && bounds.contains(point.getMapPosition()) && !releventInputPointsSet.contains(point)) {
+			point.buildScreenPosition(projection);
+			relevantInputPointsList.add(point);
+			releventInputPointsSet.add(point);
 		}
 	}
 
