@@ -12,23 +12,12 @@ public class Options {
 	private int transitionDuration = DEFAULT_TRANSITION_DURATION;
 
 	private int pixelDistanceToJoinCluster;
-
-	private static final MarkerDrawingStrategy DEFAULT_MARKER_DRAWING_STRATEGY = MarkerDrawingStrategy.WITHIN_BOUNDS_ONLY;
-	private MarkerDrawingStrategy markerDrawingStrategy = DEFAULT_MARKER_DRAWING_STRATEGY;
+	
+	private int pixelBoundsPadding = 0;
 
 	private MarkerIconChooser markerIconChooser;
-
-	MarkerDrawingStrategy getMarkerDrawingStrategy() {
-		return markerDrawingStrategy;
-	}
-
-	/**
-	 * @param markerDrawingStrategy
-	 *            the markerDrawingStrategy to set
-	 */
-	public void setMarkerDrawingStrategy(MarkerDrawingStrategy markerDrawingStrategy) {
-		this.markerDrawingStrategy = markerDrawingStrategy;
-	}
+	
+	private boolean useInitialOnCameraChangeListener;
 
 	/**
 	 * @return the transitionDuration
@@ -72,5 +61,33 @@ public class Options {
 	 */
 	public void setMarkerIconChooser(MarkerIconChooser markerIconChooser) {
 		this.markerIconChooser = markerIconChooser;
+	}
+
+	/**
+	 * @return the useInitialOnCameraChangeListener
+	 */
+	boolean isUseInitialOnCameraChangeListener() {
+		return useInitialOnCameraChangeListener;
+	}
+
+	/**
+	 * @param useInitialOnCameraChangeListener the useInitialOnCameraChangeListener to set
+	 */
+	public void setUseInitialOnCameraChangeListener(boolean useInitialOnCameraChangeListener) {
+		this.useInitialOnCameraChangeListener = useInitialOnCameraChangeListener;
+	}
+
+	/**
+	 * @return the pixelBoundsPadding
+	 */
+	public int getPixelBoundsPadding() {
+		return pixelBoundsPadding;
+	}
+
+	/**
+	 * @param pixelBoundsPadding the pixelBoundsPadding to set
+	 */
+	public void setPixelBoundsPadding(int pixelBoundsPadding) {
+		this.pixelBoundsPadding = pixelBoundsPadding;
 	}
 }

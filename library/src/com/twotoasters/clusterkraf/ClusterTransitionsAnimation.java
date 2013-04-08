@@ -10,6 +10,8 @@ import java.util.HashMap;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.MarkerOptionsCreator;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.Animator.AnimatorListener;
 import com.nineoldandroids.animation.ObjectAnimator;
@@ -25,7 +27,6 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 	private final WeakReference<Options> optionsRef;
 	private final WeakReference<Host> hostRef;
 
-	private HashMap<ClusterTransition, Marker> markersByTransition;
 	private State state;
 
 	private Marker[] markers;
@@ -68,10 +69,6 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 
 		public ArrayList<ClusterTransition> getTransitions() {
 			return transitions;
-		}
-
-		private int getCount() {
-			return transitions.size();
 		}
 
 		private LatLng[] getPositions() {
@@ -124,7 +121,6 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 	 */
 	@Override
 	public void onAnimationEnd(Animator animator) {
-		state = null;
 		Host host = hostRef.get();
 		if (host != null) {
 			host.onClusterTransitionFinished();
@@ -154,19 +150,43 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 	@Override
 	public void onAnimationStart(Animator animator) {
 		GoogleMap map = mapRef.get();
-		if (map != null) {
-			markers = new Marker[state.getCount()];
-			markersByTransition = new HashMap<ClusterTransition, Marker>(state.getCount());
+		Options options = optionsRef.get();
+		if (map != null && options != null) {
 			ArrayList<ClusterTransition> transitions = state.getTransitions();
-			for (ClusterTransition transition : transitions) {
-				// TODO: plot transition marker
+			int transitionCount = transitions.size();
+			markers = new Marker[transitionCount];
+			MarkerIconChooser mic = options.getMarkerIconChooser();
+			
+			for (int i = 0; i < transitionCount; i++) {
+				
+				ClusterTransition transition = transitions.get(i);
+				ClusterPoint origin = transition.getOriginRelevantInputPointsCluster();
+				
+				MarkerOptions mo = new MarkerOptions();
+				mo.position(origin.getMapPosition());
+				if (mic != null) {
+					mic.choose(mo, origin);
+				}
+				
+				Marker marker = map.addMarker(mo);
+				
+				markers[i] = marker;
 			}
 		}
+	}
+	
+	void onHostPlottedDestinationClusterPoints() {
+		for (Marker marker : markers) {
+			marker.remove();
+		}
+		
+		state = null;
+		markers = null;
 	}
 
 	interface Host {
 		void onClusterTransitionStarting();
-
+		void onClusterTransitionStarted();
 		void onClusterTransitionFinished();
 	}
 }
