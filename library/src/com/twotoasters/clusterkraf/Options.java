@@ -17,7 +17,7 @@ public class Options {
 
 	private MarkerIconChooser markerIconChooser;
 	
-	private boolean useInitialOnCameraChangeListener;
+	private boolean useInitialOnCameraChangeListener = false;
 
 	/**
 	 * @return the transitionDuration

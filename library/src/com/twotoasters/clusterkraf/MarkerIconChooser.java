@@ -25,7 +25,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * R.drawable. `options.setMarkerIconChooser(new ResourceChooser(host));`
  */
 public abstract class MarkerIconChooser {
-	abstract void choose(MarkerOptions markerOptions, ClusterPoint clusterPoint);
+	public abstract void choose(MarkerOptions markerOptions, ClusterPoint clusterPoint);
 
 	public static class BitmapChooser extends MarkerIconChooser {
 
@@ -36,7 +36,7 @@ public abstract class MarkerIconChooser {
 		}
 
 		@Override
-		void choose(MarkerOptions markerOptions, ClusterPoint clusterPoint) {
+		public void choose(MarkerOptions markerOptions, ClusterPoint clusterPoint) {
 			Host host = hostRef.get();
 			if(host != null) {
 				Bitmap bitmap = host.getIconBitmap(clusterPoint);
@@ -58,7 +58,7 @@ public abstract class MarkerIconChooser {
 		}
 
 		@Override
-		void choose(MarkerOptions markerOptions, ClusterPoint clusterPoint) {
+		public void choose(MarkerOptions markerOptions, ClusterPoint clusterPoint) {
 			Host host = hostRef.get();
 			if(host != null) {
 				int resource = host.getIconResource(clusterPoint);

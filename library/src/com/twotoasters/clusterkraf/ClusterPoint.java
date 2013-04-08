@@ -39,6 +39,10 @@ public class ClusterPoint extends BasePoint {
 	ArrayList<InputPoint> getPointsInCluster() {
 		return pointsInClusterList;
 	}
+	
+	public InputPoint getPointAtOffset(int index) {
+		return pointsInClusterList.get(index);
+	}
 
 	public int size() {
 		return pointsInClusterList.size();

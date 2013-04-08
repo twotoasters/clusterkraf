@@ -4,6 +4,7 @@
 package com.twotoasters.clusterkraf;
 
 import java.lang.ref.WeakReference;
+import java.util.WeakHashMap;
 
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -11,27 +12,27 @@ import com.google.android.gms.maps.model.CameraPosition;
 /**
  *
  */
-class InitialOnCameraChangeListener implements OnCameraChangeListener {
+class RegisterClusteringOnCameraChangeListener implements OnCameraChangeListener {
 	
 	private final WeakReference<Host> hostRef;
 	
-	InitialOnCameraChangeListener(Host host) {
-		hostRef = new WeakReference<Host>(host);
+	public RegisterClusteringOnCameraChangeListener(Host host) {
+		this.hostRef = new WeakReference<Host>(host);
 	}
 
 	/* (non-Javadoc)
 	 * @see com.google.android.gms.maps.GoogleMap.OnCameraChangeListener#onCameraChange(com.google.android.gms.maps.model.CameraPosition)
 	 */
 	@Override
-	public void onCameraChange(CameraPosition newPosition) {
+	public void onCameraChange(CameraPosition arg0) {
 		Host host = hostRef.get();
 		if (host != null) {
-			host.onInitialCameraChange();
+			host.onRegisterClusteringOnCameraChange();
 		}
 	}
 	
 	interface Host {
-		void onInitialCameraChange();
+		void onRegisterClusteringOnCameraChange();
 	}
 
 }

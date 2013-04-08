@@ -5,13 +5,11 @@ package com.twotoasters.clusterkraf;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.MarkerOptionsCreator;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.Animator.AnimatorListener;
 import com.nineoldandroids.animation.ObjectAnimator;
@@ -63,6 +61,7 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 			this.transitions = transitions;
 		}
 
+		@SuppressWarnings("unused")
 		public void setValue(float value) {
 			this.value = value;
 		}
@@ -93,9 +92,11 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 	 */
 	@Override
 	public void onAnimationUpdate(ValueAnimator animator) {
-		LatLng[] positions = state.getPositions();
-		for (int i = 0; i < markers.length; i++) {
-			markers[i].setPosition(positions[i]);
+		if (state != null && markers != null) {
+			LatLng[] positions = state.getPositions();
+			for (int i = 0; i < markers.length; i++) {
+				markers[i].setPosition(positions[i]);
+			}
 		}
 	}
 
@@ -173,6 +174,9 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 				markers[i] = marker;
 			}
 		}
+		
+		Host host = hostRef.get();
+		host.onClusterTransitionStarted();
 	}
 	
 	void onHostPlottedDestinationClusterPoints() {

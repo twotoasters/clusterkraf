@@ -34,13 +34,14 @@ class ClusteringOnCameraChangeListener implements OnCameraChangeListener {
 			Host host = hostRef.get();
 			if(host != null) {
 				dirty = true;
-				if(pendingCallbackRunnable == null) {
-					pendingCallbackRunnable = new CallbackRunnable(this);
-					handler.postDelayed(pendingCallbackRunnable, CALLBACK_DELAY_MILLISECONDS);
-				} else {
-					handler.removeCallbacks(pendingCallbackRunnable);
-					handler.postDelayed(pendingCallbackRunnable, CALLBACK_DELAY_MILLISECONDS);
-				}
+				host.onClusteringCameraChange();
+//				if(pendingCallbackRunnable == null) {
+//					pendingCallbackRunnable = new CallbackRunnable(this);
+//					handler.postDelayed(pendingCallbackRunnable, CALLBACK_DELAY_MILLISECONDS);
+//				} else {
+//					handler.removeCallbacks(pendingCallbackRunnable);
+//					handler.postDelayed(pendingCallbackRunnable, CALLBACK_DELAY_MILLISECONDS);
+//				}
 			}
 		}
 	}

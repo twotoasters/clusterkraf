@@ -7,6 +7,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.os.Handler;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -47,9 +49,7 @@ public class ClusterkrafMapHelper {
 			this.points.addAll(points);
 		}
 		
-		if (options.isUseInitialOnCameraChangeListener()) {
-			map.setOnCameraChangeListener(new InitialOnCameraChangeListener(innerCallbackListener));
-		}
+		showAllClusters();
 	}
 
 	public void add(InputPoint inputPoint) {
@@ -98,20 +98,20 @@ public class ClusterkrafMapHelper {
 	}
 	
 	private void drawMarkers() {
-		drawMarkers(true);
-	}
-	
-	private void drawMarkers(boolean visible) {
 		GoogleMap map = mapRef.get();
 		if (map != null && currentClusters != null) {
+			currentMarkers = new ArrayList<Marker>(currentClusters.size());
+			currentClusterPointsByMarker = new HashMap<Marker, ClusterPoint>(currentClusters.size());
 			MarkerIconChooser mic = options.getMarkerIconChooser();
 			for (ClusterPoint clusterPoint : currentClusters) {
 				MarkerOptions markerOptions = new MarkerOptions();
 				markerOptions.position(clusterPoint.getMapPosition());
-				markerOptions.visible(visible);
 				if (mic != null) {
 					mic.choose(markerOptions, clusterPoint);
 				}
+				Marker marker = map.addMarker(markerOptions);
+				currentMarkers.add(marker);
+				currentClusterPointsByMarker.put(marker, clusterPoint);
 			}
 		}
 	}
@@ -127,14 +127,6 @@ public class ClusterkrafMapHelper {
 		}
 	}
 	
-	private void showCurrentMarkers() {
-		if (currentMarkers != null) {
-			for (Marker marker : currentMarkers) {
-				marker.setVisible(true);
-			}
-		}
-	}
-
 	private void updateClustersAndTransition() {
 		previousClusters = currentClusters;
 		previousMarkers = currentMarkers;
@@ -163,12 +155,15 @@ public class ClusterkrafMapHelper {
 			}
 			LatLngBounds bounds = builder.build();
 			map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, options.getPixelBoundsPadding()));
+			map.setOnCameraChangeListener(new RegisterClusteringOnCameraChangeListener(innerCallbackListener));
 		}
 	}
 
-	private static class InnerCallbackListener implements ClusteringOnCameraChangeListener.Host, ClusterTransitionsAnimation.Host, InitialOnCameraChangeListener.Host {
+	private static class InnerCallbackListener implements ClusteringOnCameraChangeListener.Host, ClusterTransitionsAnimation.Host, RegisterClusteringOnCameraChangeListener.Host {
 		
 		private final WeakReference<ClusterkrafMapHelper> clusterkrafRef;
+		
+		private final Handler handler = new Handler(); 
 		
 		private InnerCallbackListener(ClusterkrafMapHelper clusterkraf) {
 			clusterkrafRef = new WeakReference<ClusterkrafMapHelper>(clusterkraf);
@@ -203,7 +198,6 @@ public class ClusterkrafMapHelper {
 			ClusterkrafMapHelper clusterkraf = clusterkrafRef.get();
 			if (clusterkraf != null) {
 				clusterkraf.removePreviousMarkers();
-				clusterkraf.drawMarkers(false);
 			}
 		}
 
@@ -217,27 +211,30 @@ public class ClusterkrafMapHelper {
 		public void onClusterTransitionFinished() {
 			ClusterkrafMapHelper clusterkraf = clusterkrafRef.get();
 			if (clusterkraf != null) {
-				clusterkraf.showCurrentMarkers();
+				clusterkraf.drawMarkers();
 				clusterkraf.transitionsAnimation.onHostPlottedDestinationClusterPoints();
 			}
 			clusteringOnCameraChangeListener.setDirty(false);
 		}
 
 		/* (non-Javadoc)
-		 * @see com.twotoasters.clusterkraf.InitialOnCameraChangeListener.Host#onInitialCameraChange()
+		 * @see com.twotoasters.clusterkraf.RegisterClusteringOnCameraChangeListener.Host#onRegisterClusteringOnCameraChange()
 		 */
 		@Override
-		public void onInitialCameraChange() {
-			ClusterkrafMapHelper clusterkraf = clusterkrafRef.get();
-			if (clusterkraf != null) {
-				clusterkraf.showAllClusters();
-				GoogleMap map = clusterkraf.mapRef.get();
-				if (map != null) {
-					map.setOnCameraChangeListener(clusteringOnCameraChangeListener);
+		public void onRegisterClusteringOnCameraChange() {
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					ClusterkrafMapHelper clusterkraf = clusterkrafRef.get();
+					if (clusterkraf != null) {
+						GoogleMap map = clusterkraf.mapRef.get();
+						if (map != null) {
+							map.setOnCameraChangeListener(clusteringOnCameraChangeListener);
+						}
+					}
 				}
-			}
+			});
 		}
-
 	}
 
 }
