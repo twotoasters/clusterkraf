@@ -34,7 +34,12 @@ public class InputPoint extends BasePoint {
 		return tag;
 	}
 	
+	/**
+	 * 
+	 * @param tag
+	 */
 	public void setTag(Object tag) {
 		this.tag = tag;
 	}
+
 }

@@ -16,7 +16,7 @@ import com.google.android.gms.maps.model.LatLngBoundsCreator;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class ClusterkrafMapHelper {
+public class Clusterkraf {
 
 	private final WeakReference<GoogleMap> mapRef;
 	private final Options options;
@@ -40,7 +40,7 @@ public class ClusterkrafMapHelper {
 	 * @param options
 	 *            customized options
 	 */
-	public ClusterkrafMapHelper(GoogleMap map, Options options, ArrayList<InputPoint> points) {
+	public Clusterkraf(GoogleMap map, Options options, ArrayList<InputPoint> points) {
 		this.mapRef = new WeakReference<GoogleMap>(map);
 		this.options = options;
 		this.transitionsAnimation = new ClusterTransitionsAnimation(map, options, innerCallbackListener);
@@ -102,7 +102,7 @@ public class ClusterkrafMapHelper {
 		if (map != null && currentClusters != null) {
 			currentMarkers = new ArrayList<Marker>(currentClusters.size());
 			currentClusterPointsByMarker = new HashMap<Marker, ClusterPoint>(currentClusters.size());
-			MarkerIconChooser mic = options.getMarkerIconChooser();
+			MarkerOptionsChooser mic = options.getMarkerOptionsChooser();
 			for (ClusterPoint clusterPoint : currentClusters) {
 				MarkerOptions markerOptions = new MarkerOptions();
 				markerOptions.position(clusterPoint.getMapPosition());
@@ -148,32 +148,26 @@ public class ClusterkrafMapHelper {
 		drawMarkers();
 		
 		GoogleMap map = mapRef.get();
-		if (map != null && currentClusters != null) {
-			LatLngBounds.Builder builder = LatLngBounds.builder();
-			for (ClusterPoint clusterPoint : currentClusters) {
-				builder.include(clusterPoint.getMapPosition());
-			}
-			LatLngBounds bounds = builder.build();
-			map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, options.getPixelBoundsPadding()));
-			map.setOnCameraChangeListener(new RegisterClusteringOnCameraChangeListener(innerCallbackListener));
+		if (map != null) {
+			map.setOnCameraChangeListener(innerCallbackListener.clusteringOnCameraChangeListener);
 		}
 	}
 
-	private static class InnerCallbackListener implements ClusteringOnCameraChangeListener.Host, ClusterTransitionsAnimation.Host, RegisterClusteringOnCameraChangeListener.Host {
+	private static class InnerCallbackListener implements ClusteringOnCameraChangeListener.Host, ClusterTransitionsAnimation.Host {
 		
-		private final WeakReference<ClusterkrafMapHelper> clusterkrafRef;
+		private final WeakReference<Clusterkraf> clusterkrafRef;
 		
 		private final Handler handler = new Handler(); 
 		
-		private InnerCallbackListener(ClusterkrafMapHelper clusterkraf) {
-			clusterkrafRef = new WeakReference<ClusterkrafMapHelper>(clusterkraf);
+		private InnerCallbackListener(Clusterkraf clusterkraf) {
+			clusterkrafRef = new WeakReference<Clusterkraf>(clusterkraf);
 		}
 
 		private final ClusteringOnCameraChangeListener clusteringOnCameraChangeListener = new ClusteringOnCameraChangeListener(this);
 
 		@Override
 		public void onClusteringCameraChange() {
-			ClusterkrafMapHelper clusterkraf = clusterkrafRef.get();
+			Clusterkraf clusterkraf = clusterkrafRef.get();
 			if (clusterkraf != null) {
 				clusterkraf.updateClustersAndTransition();
 			}
@@ -195,7 +189,7 @@ public class ClusterkrafMapHelper {
 		 */
 		@Override
 		public void onClusterTransitionStarted() {
-			ClusterkrafMapHelper clusterkraf = clusterkrafRef.get();
+			Clusterkraf clusterkraf = clusterkrafRef.get();
 			if (clusterkraf != null) {
 				clusterkraf.removePreviousMarkers();
 			}
@@ -209,31 +203,12 @@ public class ClusterkrafMapHelper {
 		 */
 		@Override
 		public void onClusterTransitionFinished() {
-			ClusterkrafMapHelper clusterkraf = clusterkrafRef.get();
+			Clusterkraf clusterkraf = clusterkrafRef.get();
 			if (clusterkraf != null) {
 				clusterkraf.drawMarkers();
 				clusterkraf.transitionsAnimation.onHostPlottedDestinationClusterPoints();
 			}
 			clusteringOnCameraChangeListener.setDirty(false);
-		}
-
-		/* (non-Javadoc)
-		 * @see com.twotoasters.clusterkraf.RegisterClusteringOnCameraChangeListener.Host#onRegisterClusteringOnCameraChange()
-		 */
-		@Override
-		public void onRegisterClusteringOnCameraChange() {
-			handler.post(new Runnable() {
-				@Override
-				public void run() {
-					ClusterkrafMapHelper clusterkraf = clusterkrafRef.get();
-					if (clusterkraf != null) {
-						GoogleMap map = clusterkraf.mapRef.get();
-						if (map != null) {
-							map.setOnCameraChangeListener(clusteringOnCameraChangeListener);
-						}
-					}
-				}
-			});
 		}
 	}
 

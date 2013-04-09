@@ -156,7 +156,7 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 			ArrayList<ClusterTransition> transitions = state.getTransitions();
 			int transitionCount = transitions.size();
 			markers = new Marker[transitionCount];
-			MarkerIconChooser mic = options.getMarkerIconChooser();
+			MarkerOptionsChooser mic = options.getMarkerOptionsChooser();
 			
 			for (int i = 0; i < transitionCount; i++) {
 				

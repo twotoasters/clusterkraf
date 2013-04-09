@@ -24,10 +24,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * ResourceChooser.Host such that it just returns the desired ID from your
  * R.drawable. `options.setMarkerIconChooser(new ResourceChooser(host));`
  */
-public abstract class MarkerIconChooser {
+public abstract class MarkerOptionsChooser {
 	public abstract void choose(MarkerOptions markerOptions, ClusterPoint clusterPoint);
 
-	public static class BitmapChooser extends MarkerIconChooser {
+	public static class BitmapChooser extends MarkerOptionsChooser {
 
 		private final WeakReference<Host> hostRef;
 
@@ -49,7 +49,7 @@ public abstract class MarkerIconChooser {
 		}
 	}
 
-	public static class ResourceChooser extends MarkerIconChooser {
+	public static class ResourceChooser extends MarkerOptionsChooser {
 
 		private final WeakReference<Host> hostRef;
 

@@ -2,5 +2,8 @@
 <resources>
 
     <string name="app_name">Clusterkraf Sample</string>
+    
+    <string name="point_number_x">Point #%1$s</string>
+    <string name="including_two_toasters">%1$s (including Two Toasters)</string>
 
 </resources>

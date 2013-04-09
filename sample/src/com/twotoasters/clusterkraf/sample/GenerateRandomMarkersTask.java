@@ -4,19 +4,23 @@
 package com.twotoasters.clusterkraf.sample;
 
 import java.lang.ref.WeakReference;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import android.os.AsyncTask;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.twotoasters.clusterkraf.InputPoint;
 
 class GenerateRandomMarkersTask extends AsyncTask<Integer, Void, ArrayList<InputPoint>> {
 
 	private final WeakReference<Host> hostRef;
+	private final LatLngBounds bounds;
 
-	GenerateRandomMarkersTask(Host host) {
+	GenerateRandomMarkersTask(Host host, LatLngBounds bounds) {
 		this.hostRef = new WeakReference<Host>(host);
+		this.bounds = bounds;
 	}
 
 	/*
@@ -27,16 +31,28 @@ class GenerateRandomMarkersTask extends AsyncTask<Integer, Void, ArrayList<Input
 	@Override
 	protected ArrayList<InputPoint> doInBackground(Integer... params) {
 		ArrayList<InputPoint> inputPoints = new ArrayList<InputPoint>(params[0]);
+		NumberFormat nf = NumberFormat.getInstance();
 		for (int i = 0; i < params[0]; i++) {
-			RandomMarker randomMarker = new RandomMarker(getRandomLatLng(), i);
-			InputPoint point = new InputPoint(randomMarker.getLatLng(), randomMarker);
+			MarkerData marker;
+			if (i == 0) {
+				marker = MarkerData.TwoToasters;
+			} else {
+				marker = new MarkerData(getRandomLatLng(), nf.format(i));
+			}
+			InputPoint point = new InputPoint(marker.getLatLng(), marker);
 			inputPoints.add(point);
 		}
 		return inputPoints;
 	}
 
 	private LatLng getRandomLatLng() {
-		return new LatLng((Math.random() * 180) - 90, (Math.random() * 360) - 180);
+		double latitude = getRandomBetween(bounds.southwest.latitude, bounds.northeast.latitude);
+		double longitude = getRandomBetween(bounds.southwest.longitude, bounds.northeast.longitude);
+		return new LatLng(latitude, longitude);
+	}
+
+	private double getRandomBetween(double min, double max) {
+		return min + (Math.random() * ((max - min)));
 	}
 
 	/*

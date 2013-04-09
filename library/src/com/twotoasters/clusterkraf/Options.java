@@ -10,15 +10,14 @@ public class Options {
 
 	private static final int DEFAULT_TRANSITION_DURATION = 300;
 	private int transitionDuration = DEFAULT_TRANSITION_DURATION;
-
-	private int pixelDistanceToJoinCluster;
+	
+	private static final int DEFAULT_PIXEL_DISTANCE_TO_JOIN_CLUSTER = 150;
+	private int pixelDistanceToJoinCluster = DEFAULT_PIXEL_DISTANCE_TO_JOIN_CLUSTER;
 	
 	private int pixelBoundsPadding = 0;
 
-	private MarkerIconChooser markerIconChooser;
+	private MarkerOptionsChooser markerOptionsChooser;
 	
-	private boolean useInitialOnCameraChangeListener = false;
-
 	/**
 	 * @return the transitionDuration
 	 */
@@ -50,37 +49,23 @@ public class Options {
 	}
 
 	/**
-	 * @return the markerIconChooser
+	 * @return the markerOptionsChooser
 	 */
-	public MarkerIconChooser getMarkerIconChooser() {
-		return markerIconChooser;
+	MarkerOptionsChooser getMarkerOptionsChooser() {
+		return markerOptionsChooser;
 	}
 
 	/**
-	 * @param markerIconChooser the markerIconChooser to set
+	 * @param markerOptionsChooser the markerIconChooser to set
 	 */
-	public void setMarkerIconChooser(MarkerIconChooser markerIconChooser) {
-		this.markerIconChooser = markerIconChooser;
-	}
-
-	/**
-	 * @return the useInitialOnCameraChangeListener
-	 */
-	boolean isUseInitialOnCameraChangeListener() {
-		return useInitialOnCameraChangeListener;
-	}
-
-	/**
-	 * @param useInitialOnCameraChangeListener the useInitialOnCameraChangeListener to set
-	 */
-	public void setUseInitialOnCameraChangeListener(boolean useInitialOnCameraChangeListener) {
-		this.useInitialOnCameraChangeListener = useInitialOnCameraChangeListener;
+	public void setMarkerOptionsChooser(MarkerOptionsChooser markerOptionsChooser) {
+		this.markerOptionsChooser = markerOptionsChooser;
 	}
 
 	/**
 	 * @return the pixelBoundsPadding
 	 */
-	public int getPixelBoundsPadding() {
+	int getPixelBoundsPadding() {
 		return pixelBoundsPadding;
 	}
 
