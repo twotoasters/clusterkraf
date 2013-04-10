@@ -170,10 +170,12 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 			// plot stationary clusters
 			ArrayList<ClusterPoint> stationaryClusters = transitions.stationary;
 			int stationaryClusterCount = stationaryClusters.size();
-			stationaryMarkers = new Marker[stationaryClusterCount];
-			for (int i = 0; i < stationaryClusterCount; i++) {
-				ClusterPoint stationaryCluster = stationaryClusters.get(i);
-				stationaryMarkers[i] = addMarker(map, moc, stationaryCluster);
+			if (stationaryClusterCount > 0) {
+				stationaryMarkers = new Marker[stationaryClusterCount];
+				for (int i = 0; i < stationaryClusterCount; i++) {
+					ClusterPoint stationaryCluster = stationaryClusters.get(i);
+					stationaryMarkers[i] = addMarker(map, moc, stationaryCluster);
+				}
 			}
 		}
 
@@ -182,18 +184,22 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 	}
 
 	void onHostPlottedDestinationClusterPoints() {
-		for (Marker marker : animatedMarkers) {
-			marker.remove();
+		if (animatedMarkers != null && animatedMarkers.length > 0) {
+			for (Marker marker : animatedMarkers) {
+				marker.remove();
+			}
+			animatedMarkers = null;
 		}
 
-		for (Marker marker : stationaryMarkers) {
-			marker.remove();
+		if (stationaryMarkers != null && stationaryMarkers.length > 0) {
+			for (Marker marker : stationaryMarkers) {
+				marker.remove();
+			}
+			stationaryMarkers = null;
 		}
 
 		state = null;
 		transitions = null;
-		animatedMarkers = null;
-		stationaryMarkers = null;
 	}
 
 	private Marker addMarker(GoogleMap map, MarkerOptionsChooser moc, ClusterPoint clusterPoint) {
