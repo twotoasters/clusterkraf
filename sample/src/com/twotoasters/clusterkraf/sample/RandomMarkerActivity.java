@@ -176,6 +176,7 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 			Options options = new Options();
 			options.setPixelDistanceToJoinCluster(150);
 			options.setTransitionDuration(600);
+			options.setExpandBoundsFactor(0.5d);
 			options.setMarkerOptionsChooser(new ToastedMarkerOptionsChooser());
 			clusterkraf = new Clusterkraf(map, options, inputPoints);
 		}
