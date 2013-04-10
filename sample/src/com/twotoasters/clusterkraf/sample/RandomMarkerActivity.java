@@ -108,6 +108,21 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see android.support.v4.app.FragmentActivity#onPause()
+	 */
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if (clusterkraf != null) {
+			clusterkraf.clear();
+			clusterkraf = null;
+			map.clear();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.support.v4.app.FragmentActivity#onResume()
 	 */
 	@Override
