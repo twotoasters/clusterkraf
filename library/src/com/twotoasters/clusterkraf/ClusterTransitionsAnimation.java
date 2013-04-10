@@ -25,9 +25,11 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 	private final WeakReference<Options> optionsRef;
 	private final WeakReference<Host> hostRef;
 
-	private State state;
+	private AnimatedTransitionState state;
+	private ClusterTransitions transitions;
 
-	private Marker[] markers;
+	private Marker[] animatedMarkers;
+	private Marker[] stationaryMarkers;
 
 	ClusterTransitionsAnimation(GoogleMap map, Options options, Host host) {
 		mapRef = new WeakReference<GoogleMap>(map);
@@ -35,13 +37,14 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 		hostRef = new WeakReference<Host>(host);
 	}
 
-	void animate(ArrayList<ClusterTransition> transitions) {
-		if (state == null) {
+	void animate(ClusterTransitions transitions) {
+		if (this.state == null) {
 			Options options = optionsRef.get();
 			Host host = hostRef.get();
 			if (options != null && host != null) {
-				state = new State(transitions);
-				ObjectAnimator animator = ObjectAnimator.ofFloat(state, "value", 0f, 1f);
+				this.state = new AnimatedTransitionState(transitions.animated);
+				this.transitions = transitions;
+				ObjectAnimator animator = ObjectAnimator.ofFloat(this.state, "value", 0f, 1f);
 				animator.addListener(this);
 				animator.addUpdateListener(this);
 				animator.setDuration(optionsRef.get().getTransitionDuration());
@@ -51,13 +54,13 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 		}
 	}
 
-	private class State {
+	private class AnimatedTransitionState {
 
-		private final ArrayList<ClusterTransition> transitions;
+		private final ArrayList<AnimatedTransition> transitions;
 
 		private float value;
 
-		private State(ArrayList<ClusterTransition> transitions) {
+		private AnimatedTransitionState(ArrayList<AnimatedTransition> transitions) {
 			this.transitions = transitions;
 		}
 
@@ -66,15 +69,15 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 			this.value = value;
 		}
 
-		public ArrayList<ClusterTransition> getTransitions() {
+		public ArrayList<AnimatedTransition> getTransitions() {
 			return transitions;
 		}
 
 		private LatLng[] getPositions() {
 			LatLng[] positions = new LatLng[transitions.size()];
 			int i = 0;
-			for (ClusterTransition transition : transitions) {
-				LatLng start = transition.getOriginRelevantInputPointsCluster().getMapPosition();
+			for (AnimatedTransition transition : transitions) {
+				LatLng start = transition.getOriginClusterRelevantInputPoints().getMapPosition();
 				LatLng end = transition.getDestinationClusterPoint().getMapPosition();
 				double currentLat = start.latitude + (value * (end.latitude - start.latitude));
 				double currentLon = start.longitude + (value * (end.longitude - start.longitude));
@@ -92,10 +95,10 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 	 */
 	@Override
 	public void onAnimationUpdate(ValueAnimator animator) {
-		if (state != null && markers != null) {
+		if (state != null && animatedMarkers != null) {
 			LatLng[] positions = state.getPositions();
-			for (int i = 0; i < markers.length; i++) {
-				markers[i].setPosition(positions[i]);
+			for (int i = 0; i < animatedMarkers.length; i++) {
+				animatedMarkers[i].setPosition(positions[i]);
 			}
 		}
 	}
@@ -153,44 +156,60 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 		GoogleMap map = mapRef.get();
 		Options options = optionsRef.get();
 		if (map != null && options != null) {
-			ArrayList<ClusterTransition> transitions = state.getTransitions();
-			int transitionCount = transitions.size();
-			markers = new Marker[transitionCount];
-			MarkerOptionsChooser mic = options.getMarkerOptionsChooser();
-			
-			for (int i = 0; i < transitionCount; i++) {
-				
-				ClusterTransition transition = transitions.get(i);
-				ClusterPoint origin = transition.getOriginRelevantInputPointsCluster();
-				
-				MarkerOptions mo = new MarkerOptions();
-				mo.position(origin.getMapPosition());
-				if (mic != null) {
-					mic.choose(mo, origin);
-				}
-				
-				Marker marker = map.addMarker(mo);
-				
-				markers[i] = marker;
+			MarkerOptionsChooser moc = options.getMarkerOptionsChooser();
+
+			// plot animated transitions at starting point
+			ArrayList<AnimatedTransition> animatedTransitions = state.getTransitions();
+			int animatedTransitionCount = animatedTransitions.size();
+			animatedMarkers = new Marker[animatedTransitionCount];
+			for (int i = 0; i < animatedTransitionCount; i++) {
+				ClusterPoint origin = animatedTransitions.get(i).getOriginClusterRelevantInputPoints();
+				animatedMarkers[i] = addMarker(map, moc, origin);
+			}
+
+			// plot stationary clusters
+			ArrayList<ClusterPoint> stationaryClusters = transitions.stationary;
+			int stationaryClusterCount = stationaryClusters.size();
+			stationaryMarkers = new Marker[stationaryClusterCount];
+			for (int i = 0; i < stationaryClusterCount; i++) {
+				ClusterPoint stationaryCluster = stationaryClusters.get(i);
+				stationaryMarkers[i] = addMarker(map, moc, stationaryCluster);
 			}
 		}
-		
+
 		Host host = hostRef.get();
 		host.onClusterTransitionStarted();
 	}
-	
+
 	void onHostPlottedDestinationClusterPoints() {
-		for (Marker marker : markers) {
+		for (Marker marker : animatedMarkers) {
 			marker.remove();
 		}
-		
+
+		for (Marker marker : stationaryMarkers) {
+			marker.remove();
+		}
+
 		state = null;
-		markers = null;
+		transitions = null;
+		animatedMarkers = null;
+		stationaryMarkers = null;
+	}
+
+	private Marker addMarker(GoogleMap map, MarkerOptionsChooser moc, ClusterPoint clusterPoint) {
+		MarkerOptions mo = new MarkerOptions();
+		mo.position(clusterPoint.getMapPosition());
+		if (moc != null) {
+			moc.choose(mo, clusterPoint);
+		}
+		return map.addMarker(mo);
 	}
 
 	interface Host {
 		void onClusterTransitionStarting();
+
 		void onClusterTransitionStarted();
+
 		void onClusterTransitionFinished();
 	}
 }

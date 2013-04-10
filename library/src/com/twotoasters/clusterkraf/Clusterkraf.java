@@ -9,10 +9,7 @@ import java.util.HashMap;
 
 import android.os.Handler;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.LatLngBoundsCreator;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -22,7 +19,7 @@ public class Clusterkraf {
 	private final Options options;
 	private final ClusterTransitionsAnimation transitionsAnimation;
 
-	private InnerCallbackListener innerCallbackListener = new InnerCallbackListener(this);
+	private final InnerCallbackListener innerCallbackListener = new InnerCallbackListener(this);
 
 	private final ArrayList<InputPoint> points = new ArrayList<InputPoint>();
 	private ArrayList<ClusterPoint> currentClusters;
@@ -44,11 +41,11 @@ public class Clusterkraf {
 		this.mapRef = new WeakReference<GoogleMap>(map);
 		this.options = options;
 		this.transitionsAnimation = new ClusterTransitionsAnimation(map, options, innerCallbackListener);
-		
+
 		if (points != null) {
 			this.points.addAll(points);
 		}
-		
+
 		showAllClusters();
 	}
 
@@ -96,7 +93,7 @@ public class Clusterkraf {
 			currentClusters = builder.build();
 		}
 	}
-	
+
 	private void drawMarkers() {
 		GoogleMap map = mapRef.get();
 		if (map != null && currentClusters != null) {
@@ -115,7 +112,7 @@ public class Clusterkraf {
 			}
 		}
 	}
-	
+
 	private void removePreviousMarkers() {
 		GoogleMap map = mapRef.get();
 		if (map != null && previousClusters != null && previousMarkers != null) {
@@ -126,27 +123,27 @@ public class Clusterkraf {
 			previousClusters = null;
 		}
 	}
-	
+
 	private void updateClustersAndTransition() {
 		previousClusters = currentClusters;
 		previousMarkers = currentMarkers;
-		
+
 		buildClusters();
-		
+
 		GoogleMap map = mapRef.get();
 		if (map != null && currentClusters != null && previousClusters != null) {
-			ClusterTransition.Builder ctb = new ClusterTransition.Builder(map, previousClusters);
+			ClusterTransitions.Builder ctb = new ClusterTransitions.Builder(map, previousClusters);
 			for (ClusterPoint currentClusterPoint : currentClusters) {
 				ctb.add(currentClusterPoint);
 			}
 			transitionsAnimation.animate(ctb.build());
 		}
 	}
-	
+
 	private void showAllClusters() {
 		buildClusters();
 		drawMarkers();
-		
+
 		GoogleMap map = mapRef.get();
 		if (map != null) {
 			map.setOnCameraChangeListener(innerCallbackListener.clusteringOnCameraChangeListener);
@@ -154,11 +151,11 @@ public class Clusterkraf {
 	}
 
 	private static class InnerCallbackListener implements ClusteringOnCameraChangeListener.Host, ClusterTransitionsAnimation.Host {
-		
+
 		private final WeakReference<Clusterkraf> clusterkrafRef;
-		
-		private final Handler handler = new Handler(); 
-		
+
+		private final Handler handler = new Handler();
+
 		private InnerCallbackListener(Clusterkraf clusterkraf) {
 			clusterkrafRef = new WeakReference<Clusterkraf>(clusterkraf);
 		}
@@ -184,8 +181,11 @@ public class Clusterkraf {
 			clusteringOnCameraChangeListener.setDirty(true);
 		}
 
-		/* (non-Javadoc)
-		 * @see com.twotoasters.clusterkraf.ClusterTransitionsAnimation.Host#onClusterTransitionStarted()
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.twotoasters.clusterkraf.ClusterTransitionsAnimation.Host#
+		 * onClusterTransitionStarted()
 		 */
 		@Override
 		public void onClusterTransitionStarted() {
