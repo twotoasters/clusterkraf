@@ -8,6 +8,7 @@ import java.util.HashSet;
 
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 /**
  *
@@ -19,7 +20,9 @@ public class ClusterPoint extends BasePoint {
 
 	private final boolean transition;
 
-	public ClusterPoint(InputPoint initialPoint, Projection projection, boolean transition) {
+	private LatLngBounds boundsOfInputPoints;
+
+	ClusterPoint(InputPoint initialPoint, Projection projection, boolean transition) {
 		this.mapPosition = initialPoint.getMapPosition();
 		this.transition = transition;
 		add(initialPoint);
@@ -34,12 +37,14 @@ public class ClusterPoint extends BasePoint {
 	void add(InputPoint point) {
 		pointsInClusterList.add(point);
 		pointsInClusterSet.add(point);
+
+		boundsOfInputPoints = null;
 	}
 
 	ArrayList<InputPoint> getPointsInCluster() {
 		return pointsInClusterList;
 	}
-	
+
 	public InputPoint getPointAtOffset(int index) {
 		return pointsInClusterList.get(index);
 	}
@@ -60,7 +65,7 @@ public class ClusterPoint extends BasePoint {
 	@Override
 	void clearScreenPosition() {
 		super.clearScreenPosition();
-		for(InputPoint inputPoint : pointsInClusterList) {
+		for (InputPoint inputPoint : pointsInClusterList) {
 			inputPoint.clearScreenPosition();
 		}
 	}
@@ -70,6 +75,17 @@ public class ClusterPoint extends BasePoint {
 	 */
 	public boolean isTransition() {
 		return transition;
+	}
+
+	LatLngBounds getBoundsOfInputPoints() {
+		if (boundsOfInputPoints == null) {
+			LatLngBounds.Builder builder = LatLngBounds.builder();
+			for (InputPoint inputPoint : pointsInClusterList) {
+				builder.include(inputPoint.getMapPosition());
+			}
+			boundsOfInputPoints = builder.build();
+		}
+		return boundsOfInputPoints;
 	}
 
 }

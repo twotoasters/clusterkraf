@@ -9,7 +9,12 @@ import java.util.HashMap;
 
 import android.os.Handler;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.CancelableCallback;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -147,10 +152,54 @@ public class Clusterkraf {
 		GoogleMap map = mapRef.get();
 		if (map != null) {
 			map.setOnCameraChangeListener(innerCallbackListener.clusteringOnCameraChangeListener);
+			map.setOnMarkerClickListener(innerCallbackListener);
+			map.setOnInfoWindowClickListener(innerCallbackListener);
 		}
 	}
 
-	private static class InnerCallbackListener implements ClusteringOnCameraChangeListener.Host, ClusterTransitionsAnimation.Host {
+	public void zoomToBounds(ClusterPoint clusterPoint) {
+		GoogleMap map = mapRef.get();
+		if (map != null && clusterPoint != null) {
+			innerCallbackListener.clusteringOnCameraChangeListener.setDirty(true);
+			CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(clusterPoint.getBoundsOfInputPoints(), options.getZoomToBoundsPadding());
+			map.animateCamera(cameraUpdate, options.getZoomToBoundsAnimationDuration(), null);
+			/*
+			 * TODO : ClusteringCancelableCallback
+			 */
+			innerCallbackListener.clusteringOnCameraChangeListener.setDirty(false);
+		}
+	}
+
+	public void showInfoWindow(Marker marker, ClusterPoint clusterPoint) {
+		GoogleMap map = mapRef.get();
+		if (map != null && marker != null && clusterPoint != null) {
+			innerCallbackListener.clusteringOnCameraChangeListener.setDirty(true);
+			CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(marker.getPosition());
+			map.animateCamera(cameraUpdate, options.getShowInfoWindowAnimationDuration(), new CancelableCallback() {
+
+				@Override
+				public void onFinish() {
+					innerCallbackListener.handler.post(new Runnable() {
+
+						@Override
+						public void run() {
+							innerCallbackListener.clusteringOnCameraChangeListener.setDirty(false);
+
+						}
+					});
+				}
+
+				@Override
+				public void onCancel() {
+					innerCallbackListener.clusteringOnCameraChangeListener.setDirty(false);
+				}
+			});
+			marker.showInfoWindow();
+		}
+	}
+
+	private static class InnerCallbackListener implements ClusteringOnCameraChangeListener.Host, ClusterTransitionsAnimation.Host, OnMarkerClickListener,
+			OnInfoWindowClickListener {
 
 		private final WeakReference<Clusterkraf> clusterkrafRef;
 
@@ -209,6 +258,99 @@ public class Clusterkraf {
 				clusterkraf.transitionsAnimation.onHostPlottedDestinationClusterPoints();
 			}
 			clusteringOnCameraChangeListener.setDirty(false);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * com.google.android.gms.maps.GoogleMap.OnMarkerClickListener#onMarkerClick
+		 * (com.google.android.gms.maps.model.Marker)
+		 */
+		@Override
+		public boolean onMarkerClick(Marker marker) {
+			boolean handled = false;
+			Clusterkraf clusterkraf = clusterkrafRef.get();
+			if (clusterkraf != null) {
+				ClusterPoint clusterPoint = clusterkraf.currentClusterPointsByMarker.get(marker);
+				OnMarkerClickDownstreamListener downstreamListener = clusterkraf.options.getOnMarkerClickDownstreamListener();
+				if (downstreamListener != null) {
+					handled = downstreamListener.onMarkerClick(marker, clusterPoint);
+				}
+				if (handled == false && clusterPoint != null) {
+					if (clusterPoint.size() > 1) {
+						switch(clusterkraf.options.getClusterClickBehavior()) {
+							case ZOOM_TO_BOUNDS:
+								clusterkraf.zoomToBounds(clusterPoint);
+								handled = true;
+								break;
+							case SHOW_INFO_WINDOW:
+								clusterkraf.showInfoWindow(marker, clusterPoint);
+								handled = true;
+								break;
+							case NO_OP:
+								// no-op
+								break;
+						}
+					} else {
+						switch(clusterkraf.options.getSinglePointClickBehavior()) {
+							case SHOW_INFO_WINDOW:
+								clusterkraf.showInfoWindow(marker, clusterPoint);
+								handled = true;
+								break;
+							case NO_OP:
+								// no-op
+								break;
+						}
+					}
+				}
+			}
+			return handled;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener#
+		 * onInfoWindowClick(com.google.android.gms.maps.model.Marker)
+		 */
+		@Override
+		public void onInfoWindowClick(Marker marker) {
+			Clusterkraf clusterkraf = clusterkrafRef.get();
+			if (clusterkraf != null) {
+				boolean handled = false;
+				ClusterPoint clusterPoint = clusterkraf.currentClusterPointsByMarker.get(marker);
+				OnInfoWindowClickDownstreamListener downstreamListener = clusterkraf.options.getOnInfoWindowClickDownstreamListener();
+				if (downstreamListener != null) {
+					handled = downstreamListener.onInfoWindowClick(marker, clusterPoint);
+				}
+				if (handled == false && clusterPoint != null) {
+					if (clusterPoint.size() > 1) {
+						switch(clusterkraf.options.getClusterInfoWindowClickBehavior()) {
+							case ZOOM_TO_BOUNDS:
+								clusterkraf.zoomToBounds(clusterPoint);
+								break;
+							case HIDE_INFO_WINDOW:
+								marker.hideInfoWindow();
+								break;
+							case NO_OP:
+								// no-op
+								break;
+						}
+					} else {
+						switch(clusterkraf.options.getSinglePointInfoWindowClickBehavior()) {
+							case HIDE_INFO_WINDOW:
+								marker.hideInfoWindow();
+								break;
+							case NO_OP:
+								// no-op
+								break;
+						}
+					}
+				}
+
+			}
+
 		}
 	}
 

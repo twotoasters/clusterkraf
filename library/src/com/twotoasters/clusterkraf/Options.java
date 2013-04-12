@@ -14,12 +14,30 @@ public class Options {
 	private static final int DEFAULT_PIXEL_DISTANCE_TO_JOIN_CLUSTER = 150;
 	private int pixelDistanceToJoinCluster = DEFAULT_PIXEL_DISTANCE_TO_JOIN_CLUSTER;
 
-	private int pixelBoundsPadding = 0;
-
 	private static final double DEFAULT_EXPAND_BOUNDS_FACTOR = 0;
 	private double expandBoundsFactor = DEFAULT_EXPAND_BOUNDS_FACTOR;
 
 	private MarkerOptionsChooser markerOptionsChooser;
+
+	private OnMarkerClickDownstreamListener onMarkerClickDownstreamListener;
+
+	private OnInfoWindowClickDownstreamListener onInfoWindowClickDownstreamListener;
+
+	private int zoomToBoundsPadding = 75;
+
+	private final int DEFAULT_ZOOM_TO_BOUNDS_ANIMATION_DURATION = 300;
+	private int zoomToBoundsAnimationDuration = DEFAULT_ZOOM_TO_BOUNDS_ANIMATION_DURATION;
+
+	private final int DEFAULT_SHOW_INFO_WINDOW_ANIMATION_DURATION = 300;
+	private int showInfoWindowAnimationDuration = DEFAULT_SHOW_INFO_WINDOW_ANIMATION_DURATION;
+
+	private ClusterClickBehavior clusterClickBehavior = ClusterClickBehavior.ZOOM_TO_BOUNDS;
+
+	private ClusterInfoWindowClickBehavior clusterInfoWindowClickBehavior = ClusterInfoWindowClickBehavior.HIDE_INFO_WINDOW;
+
+	private SinglePointClickBehavior singlePointClickBehavior = SinglePointClickBehavior.SHOW_INFO_WINDOW;
+
+	private SinglePointInfoWindowClickBehavior singlePointInfoWindowClickBehavior = SinglePointInfoWindowClickBehavior.HIDE_INFO_WINDOW;
 
 	/**
 	 * @return the transitionDuration
@@ -81,17 +99,153 @@ public class Options {
 	}
 
 	/**
-	 * @return the pixelBoundsPadding
+	 * @return the onMarkerClickDownstreamListener
 	 */
-	int getPixelBoundsPadding() {
-		return pixelBoundsPadding;
+	OnMarkerClickDownstreamListener getOnMarkerClickDownstreamListener() {
+		return onMarkerClickDownstreamListener;
 	}
 
 	/**
-	 * @param pixelBoundsPadding
-	 *            the pixelBoundsPadding to set
+	 * @param onMarkerClickDownstreamListener
+	 *            the onMarkerClickDownstreamListener to set
 	 */
-	public void setPixelBoundsPadding(int pixelBoundsPadding) {
-		this.pixelBoundsPadding = pixelBoundsPadding;
+	public void setOnMarkerClickDownstreamListener(OnMarkerClickDownstreamListener onMarkerClickDownstreamListener) {
+		this.onMarkerClickDownstreamListener = onMarkerClickDownstreamListener;
+	}
+
+	/**
+	 * @return the onInfoWindowClickDownstreamListener
+	 */
+	OnInfoWindowClickDownstreamListener getOnInfoWindowClickDownstreamListener() {
+		return onInfoWindowClickDownstreamListener;
+	}
+
+	/**
+	 * @param onInfoWindowClickDownstreamListener
+	 *            the onInfoWindowClickDownstreamListener to set
+	 */
+	public void setOnInfoWindowClickDownstreamListener(OnInfoWindowClickDownstreamListener onInfoWindowClickDownstreamListener) {
+		this.onInfoWindowClickDownstreamListener = onInfoWindowClickDownstreamListener;
+	}
+
+	/**
+	 * @return the clusterClickBehavior
+	 */
+	ClusterClickBehavior getClusterClickBehavior() {
+		return clusterClickBehavior;
+	}
+
+	/**
+	 * @param clusterClickBehavior
+	 *            the clusterClickBehavior to set
+	 */
+	public void setClusterClickBehavior(ClusterClickBehavior clusterClickBehavior) {
+		this.clusterClickBehavior = clusterClickBehavior;
+	}
+
+	/**
+	 * @return the clusterInfoWindowClickBehavior
+	 */
+	ClusterInfoWindowClickBehavior getClusterInfoWindowClickBehavior() {
+		return clusterInfoWindowClickBehavior;
+	}
+
+	/**
+	 * @param clusterInfoWindowClickBehavior
+	 *            the clusterInfoWindowClickBehavior to set
+	 */
+	public void setClusterInfoWindowClickBehavior(ClusterInfoWindowClickBehavior clusterInfoWindowClickBehavior) {
+		this.clusterInfoWindowClickBehavior = clusterInfoWindowClickBehavior;
+	}
+
+	/**
+	 * @return the zoomToBoundsPadding
+	 */
+	int getZoomToBoundsPadding() {
+		return zoomToBoundsPadding;
+	}
+
+	/**
+	 * @param zoomToBoundsPadding
+	 *            the zoomToBoundsPadding to set
+	 */
+	public void setZoomToBoundsPadding(int zoomToBoundsPadding) {
+		this.zoomToBoundsPadding = zoomToBoundsPadding;
+	}
+
+	/**
+	 * @return the zoomToBoundsAnimationDuration
+	 */
+	int getZoomToBoundsAnimationDuration() {
+		return zoomToBoundsAnimationDuration;
+	}
+
+	/**
+	 * @param zoomToBoundsAnimationDuration
+	 *            the zoomToBoundsAnimationDuration to set
+	 */
+	public void setZoomToBoundsAnimationDuration(int zoomToBoundsAnimationDuration) {
+		this.zoomToBoundsAnimationDuration = zoomToBoundsAnimationDuration;
+	}
+
+	/**
+	 * @return the showInfoWindowAnimationDuration
+	 */
+	int getShowInfoWindowAnimationDuration() {
+		return showInfoWindowAnimationDuration;
+	}
+
+	/**
+	 * @param showInfoWindowAnimationDuration
+	 *            the showInfoWindowAnimationDuration to set
+	 */
+	public void setShowInfoWindowAnimationDuration(int showInfoWindowAnimationDuration) {
+		this.showInfoWindowAnimationDuration = showInfoWindowAnimationDuration;
+	}
+
+	/**
+	 * @return the singlePointClickBehavior
+	 */
+	SinglePointClickBehavior getSinglePointClickBehavior() {
+		return singlePointClickBehavior;
+	}
+
+	/**
+	 * @param singlePointClickBehavior
+	 *            the singlePointClickBehavior to set
+	 */
+	public void setSinglePointClickBehavior(SinglePointClickBehavior singlePointClickBehavior) {
+		this.singlePointClickBehavior = singlePointClickBehavior;
+	}
+
+	/**
+	 * @return the singlePointInfoWindowClickBehavior
+	 */
+	SinglePointInfoWindowClickBehavior getSinglePointInfoWindowClickBehavior() {
+		return singlePointInfoWindowClickBehavior;
+	}
+
+	/**
+	 * @param singlePointInfoWindowClickBehavior
+	 *            the singlePointInfoWindowClickBehavior to set
+	 */
+	public void setSinglePointInfoWindowClickBehavior(SinglePointInfoWindowClickBehavior singlePointInfoWindowClickBehavior) {
+		this.singlePointInfoWindowClickBehavior = singlePointInfoWindowClickBehavior;
+	}
+
+	public enum ClusterClickBehavior {
+		ZOOM_TO_BOUNDS, SHOW_INFO_WINDOW, NO_OP
+	}
+
+	public enum ClusterInfoWindowClickBehavior {
+		ZOOM_TO_BOUNDS, HIDE_INFO_WINDOW, NO_OP
+	}
+
+	public enum SinglePointClickBehavior {
+		SHOW_INFO_WINDOW, NO_OP
+	}
+
+	public enum SinglePointInfoWindowClickBehavior {
+		HIDE_INFO_WINDOW, NO_OP
 	}
 }
