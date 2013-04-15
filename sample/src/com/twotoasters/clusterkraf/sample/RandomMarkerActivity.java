@@ -1,5 +1,6 @@
 package com.twotoasters.clusterkraf.sample;
 
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -28,16 +29,16 @@ import com.twotoasters.clusterkraf.ClusterPoint;
 import com.twotoasters.clusterkraf.Clusterkraf;
 import com.twotoasters.clusterkraf.InputPoint;
 import com.twotoasters.clusterkraf.MarkerOptionsChooser;
-import com.twotoasters.clusterkraf.Options;
+import com.twotoasters.clusterkraf.Options.ClusterClickBehavior;
+import com.twotoasters.clusterkraf.Options.ClusterInfoWindowClickBehavior;
+import com.twotoasters.clusterkraf.Options.SinglePointClickBehavior;
 
 public class RandomMarkerActivity extends FragmentActivity implements GenerateRandomMarkersTask.Host {
 
-	public static final String EXTRA_POINTS = "points";
+	public static final String EXTRA_OPTIONS = "options";
 
-	private static final String KEY_INPUT_POINTS = "clusterkraf input points";
-	private static final String KEY_CAMERA_POSITION = "google map camera position";
+	private Options options;
 
-	private int markerCount;
 	private LatLngBounds bounds;
 	private GoogleMap map;
 	private CameraPosition restoreCameraPosition;
@@ -57,14 +58,20 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 
 		Intent i = getIntent();
 		if (i != null) {
-			markerCount = i.getIntExtra(EXTRA_POINTS, 1);
+			Object options = i.getSerializableExtra(EXTRA_OPTIONS);
+			if (options instanceof Options) {
+				this.options = (Options)options;
+			}
+		}
+		if (this.options == null) {
+			this.options = new Options();
 		}
 
-		if (bounds != null && markerCount >= 0) {
+		if (bounds != null && options != null) {
 			setProgressBarIndeterminate(true);
 			setProgressBarIndeterminateVisibility(true);
 
-			new GenerateRandomMarkersTask(this, bounds).execute(markerCount);
+			new GenerateRandomMarkersTask(this, bounds).execute(options.markerCount);
 		}
 
 		setupActionBar();
@@ -77,7 +84,8 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 	private void setupActionBar() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			ActionBar actionBar = getActionBar();
-			actionBar.setTitle(getResources().getQuantityString(R.plurals.count_points, markerCount, NumberFormat.getInstance().format(markerCount)));
+			actionBar.setTitle(getResources().getQuantityString(R.plurals.count_points, options.markerCount,
+					NumberFormat.getInstance().format(options.markerCount)));
 			actionBar.setDisplayHomeAsUpEnabled(true);
 		}
 	}
@@ -173,11 +181,19 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 
 	private void initClusterkraf() {
 		if (map != null && inputPoints != null && inputPoints.size() > 0) {
-			Options options = new Options();
-			options.setPixelDistanceToJoinCluster(150);
-			options.setTransitionDuration(600);
-			options.setExpandBoundsFactor(0.5d);
+			com.twotoasters.clusterkraf.Options options = new com.twotoasters.clusterkraf.Options();
+			// TODO: copy settings from this.options
+			options.setTransitionDuration(this.options.transitionDuration);
+			options.setPixelDistanceToJoinCluster(this.options.pixelDistanceToJoinCluster);
+			options.setZoomToBoundsAnimationDuration(this.options.zoomToBoundsAnimationDuration);
+			options.setShowInfoWindowAnimationDuration(this.options.showInfoWindowAnimationDuration);
+			options.setExpandBoundsFactor(this.options.expandBoundsFactor);
+			options.setSinglePointClickBehavior(this.options.singlePointClickBehavior);
+			options.setClusterClickBehavior(this.options.clusterClickBehavior);
+			options.setClusterInfoWindowClickBehavior(this.options.clusterInfoWindowClickBehavior);
+
 			options.setMarkerOptionsChooser(new ToastedMarkerOptionsChooser());
+
 			clusterkraf = new Clusterkraf(map, options, inputPoints);
 		}
 	}
@@ -233,6 +249,23 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 			markerOptions.title(title);
 			markerOptions.icon(icon);
 		}
+	}
+
+	static class Options implements Serializable {
+
+		private static final long serialVersionUID = 2802382185317730662L;
+
+		int markerCount = 100;
+
+		int transitionDuration = 500;
+		int pixelDistanceToJoinCluster = 100;
+		int zoomToBoundsAnimationDuration = 500;
+		int showInfoWindowAnimationDuration = 500;
+		double expandBoundsFactor = 0.67d;
+
+		SinglePointClickBehavior singlePointClickBehavior = SinglePointClickBehavior.SHOW_INFO_WINDOW;
+		ClusterClickBehavior clusterClickBehavior = ClusterClickBehavior.ZOOM_TO_BOUNDS;
+		ClusterInfoWindowClickBehavior clusterInfoWindowClickBehavior = ClusterInfoWindowClickBehavior.ZOOM_TO_BOUNDS;
 	}
 
 }

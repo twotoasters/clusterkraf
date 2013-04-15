@@ -3,6 +3,29 @@
 
     <string name="app_name">Clusterkraf Sample</string>
     
+    <string name="mode_normal_label">Normal Mode</string>
+    <string name="mode_normal_description">Start the Clusterkraf demo with default settings. Pro tip: try this first</string>
+    <string name="mode_normal_start">Start in normal mode</string>
+    <string name="mode_advanced_label">Advanced Mode</string>
+    <string name="mode_advanced_description">Change the demo settings and see how they change the experience</string>
+    <string name="mode_advanced_start">Start in advanced Mode</string>
+    
+    <string-array name="modes_labels">
+        <item>@string/mode_normal_label</item>
+        <item>@string/mode_advanced_label</item>
+    </string-array>
+    
+    <string-array name="modes_descriptions">
+        <item>@string/mode_normal_description</item>
+        <item>@string/mode_advanced_description</item>
+    </string-array>
+    
+    <string-array name="modes_start">
+        <item>@string/mode_normal_start</item>
+        <item>@string/mode_advanced_start</item>
+    </string-array>
+    
+    
     <string name="point_number_x">Point #%1$s</string>
     <string name="including_two_toasters">%1$s (including Two Toasters)</string>
 
