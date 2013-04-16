@@ -10,24 +10,38 @@ import java.util.ArrayList;
 import android.os.AsyncTask;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.twotoasters.clusterkraf.InputPoint;
 
 class GenerateRandomMarkersTask extends AsyncTask<Integer, Void, ArrayList<InputPoint>> {
 
 	private final WeakReference<Host> hostRef;
-	private final LatLngBounds bounds;
 
-	GenerateRandomMarkersTask(Host host, LatLngBounds bounds) {
+	private final double northeastLat;
+	private final double northeastLng;
+	private final double southwestLat;
+	private final double southwestLng;
+
+	GenerateRandomMarkersTask(Host host, GeographicDistribution geographicDistribution) {
 		this.hostRef = new WeakReference<Host>(host);
-		this.bounds = bounds;
+
+		switch(geographicDistribution) {
+			case NearTwoToasters:
+				LatLng ttLatLng = MarkerData.TwoToasters.getLatLng();
+				northeastLat = ttLatLng.latitude + 0.2d;
+				northeastLng = ttLatLng.longitude + 0.2d;
+				southwestLat = ttLatLng.latitude - 0.2d;
+				southwestLng = ttLatLng.longitude - 0.2d;
+				break;
+			case Worldwide:
+			default:
+				northeastLat = 90d;
+				northeastLng = 180d;
+				southwestLat = -90d;
+				southwestLng = -180d;
+				break;
+		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.os.AsyncTask#doInBackground(Params[])
-	 */
 	@Override
 	protected ArrayList<InputPoint> doInBackground(Integer... params) {
 		ArrayList<InputPoint> inputPoints = new ArrayList<InputPoint>(params[0]);
@@ -46,8 +60,8 @@ class GenerateRandomMarkersTask extends AsyncTask<Integer, Void, ArrayList<Input
 	}
 
 	private LatLng getRandomLatLng() {
-		double latitude = getRandomBetween(bounds.southwest.latitude, bounds.northeast.latitude);
-		double longitude = getRandomBetween(bounds.southwest.longitude, bounds.northeast.longitude);
+		double latitude = getRandomBetween(southwestLat, northeastLat);
+		double longitude = getRandomBetween(southwestLng, northeastLng);
 		return new LatLng(latitude, longitude);
 	}
 
@@ -55,11 +69,6 @@ class GenerateRandomMarkersTask extends AsyncTask<Integer, Void, ArrayList<Input
 		return min + (Math.random() * ((max - min)));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-	 */
 	@Override
 	protected void onPostExecute(ArrayList<InputPoint> result) {
 		super.onPostExecute(result);
@@ -71,6 +80,10 @@ class GenerateRandomMarkersTask extends AsyncTask<Integer, Void, ArrayList<Input
 
 	public interface Host {
 		void onGenerateRandomMarkersTaskPostExecute(ArrayList<InputPoint> result);
+	}
+
+	public enum GeographicDistribution {
+		NearTwoToasters, Worldwide
 	}
 
 }

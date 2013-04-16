@@ -4,16 +4,9 @@ import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -26,19 +19,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.twotoasters.clusterkraf.ClusterPoint;
 import com.twotoasters.clusterkraf.Clusterkraf;
 import com.twotoasters.clusterkraf.InputPoint;
-import com.twotoasters.clusterkraf.MarkerOptionsChooser;
 import com.twotoasters.clusterkraf.Options.ClusterClickBehavior;
 import com.twotoasters.clusterkraf.Options.ClusterInfoWindowClickBehavior;
 import com.twotoasters.clusterkraf.Options.SinglePointClickBehavior;
+import com.twotoasters.clusterkraf.sample.GenerateRandomMarkersTask.GeographicDistribution;
 
 public class RandomMarkerActivity extends FragmentActivity implements GenerateRandomMarkersTask.Host {
 
@@ -46,7 +33,6 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 
 	private Options options;
 
-	private LatLngBounds bounds;
 	private GoogleMap map;
 	private CameraPosition restoreCameraPosition;
 	private Clusterkraf clusterkraf;
@@ -59,10 +45,6 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 
 		setContentView(R.layout.activity_random_marker);
 
-		initMap();
-
-		setupLatLngBounds();
-
 		Intent i = getIntent();
 		if (i != null) {
 			Object options = i.getSerializableExtra(EXTRA_OPTIONS);
@@ -74,12 +56,14 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 			this.options = new Options();
 		}
 
-		if (bounds != null && options != null) {
+		if (options != null) {
 			setProgressBarIndeterminate(true);
 			setProgressBarIndeterminateVisibility(true);
 
-			new GenerateRandomMarkersTask(this, bounds).execute(options.markerCount);
+			new GenerateRandomMarkersTask(this, options.geographicDistribution).execute(options.markerCount);
 		}
+
+		initMap();
 
 		setupActionBar();
 	}
@@ -95,12 +79,6 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 					NumberFormat.getInstance().format(options.markerCount)));
 			actionBar.setDisplayHomeAsUpEnabled(true);
 		}
-	}
-
-	private void setupLatLngBounds() {
-		LatLng northeastBound = new LatLng(36.086044326935806d, -78.81977666169405d);
-		LatLng southwestBound = new LatLng(35.91362426994587d, -78.9645716920495d);
-		bounds = new LatLngBounds(southwestBound, northeastBound);
 	}
 
 	@Override
@@ -120,11 +98,6 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 		return super.onOptionsItemSelected(item);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.support.v4.app.FragmentActivity#onPause()
-	 */
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -135,11 +108,6 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.support.v4.app.FragmentActivity#onResume()
-	 */
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -165,19 +133,18 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 				}
 			}
 		} else {
-			// map.setOnCameraChangeListener(null);
 			moveMapCameraToBoundsAndInitClusterkraf();
 		}
 	}
 
 	private void moveMapCameraToBoundsAndInitClusterkraf() {
-		if (map != null && bounds != null) {
+		if (map != null && options != null && inputPoints != null) {
 			try {
 				if (restoreCameraPosition != null) {
 					map.moveCamera(CameraUpdateFactory.newCameraPosition(restoreCameraPosition));
 					restoreCameraPosition = null;
 				} else {
-					map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 0));
+					map.moveCamera(CameraUpdateFactory.newLatLngZoom(inputPoints.get(0).getMapPosition(), 11));
 				}
 				initClusterkraf();
 			} catch (IllegalStateException ise) {
@@ -199,18 +166,12 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 			options.setClusterClickBehavior(this.options.clusterClickBehavior);
 			options.setClusterInfoWindowClickBehavior(this.options.clusterInfoWindowClickBehavior);
 
-			options.setMarkerOptionsChooser(new ToastedMarkerOptionsChooser());
+			options.setMarkerOptionsChooser(new ToastedMarkerOptionsChooser(this, inputPoints.get(0)));
 
 			clusterkraf = new Clusterkraf(map, options, inputPoints);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.twotoasters.clusterkraf.sample.GenerateRandomMarkersTask.Host#
-	 * onGenerateRandomMarkersTaskPostExecute()
-	 */
 	@Override
 	public void onGenerateRandomMarkersTaskPostExecute(ArrayList<InputPoint> inputPoints) {
 		setProgressBarIndeterminateVisibility(false);
@@ -218,111 +179,20 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 		initMap();
 	}
 
-	public class ToastedMarkerOptionsChooser extends MarkerOptionsChooser {
-
-		private final Paint clusterPaintLarge;
-		private final Paint clusterPaintMedium;
-		private final Paint clusterPaintSmall;
-
-		public ToastedMarkerOptionsChooser() {
-			clusterPaintMedium = new Paint();
-			clusterPaintMedium.setColor(Color.WHITE);
-			clusterPaintMedium.setAlpha(255);
-			clusterPaintMedium.setTextAlign(Paint.Align.CENTER);
-			clusterPaintMedium.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD_ITALIC));
-			clusterPaintMedium.setTextSize(getResources().getDimension(R.dimen.cluster_text_size_medium));
-
-			clusterPaintSmall = new Paint(clusterPaintMedium);
-			clusterPaintSmall.setTextSize(getResources().getDimension(R.dimen.cluster_text_size_small));
-
-			clusterPaintLarge = new Paint(clusterPaintMedium);
-			clusterPaintLarge.setTextSize(getResources().getDimension(R.dimen.cluster_text_size_large));
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * com.twotoasters.clusterkraf.MarkerIconChooser#choose(com.google.android
-		 * .gms.maps.model.MarkerOptions,
-		 * com.twotoasters.clusterkraf.ClusterPoint)
-		 */
-		@Override
-		public void choose(MarkerOptions markerOptions, ClusterPoint clusterPoint) {
-			boolean isCluster = clusterPoint.size() > 1;
-			boolean hasTwoToasters = clusterPoint.containsInputPoint(inputPoints.get(0));
-			BitmapDescriptor icon;
-			String title;
-			if (isCluster) {
-				title = getResources().getQuantityString(R.plurals.count_points, clusterPoint.size(), clusterPoint.size());
-				int clusterSize = clusterPoint.size();
-				if (hasTwoToasters) {
-					icon = BitmapDescriptorFactory.fromBitmap(getClusterBitmap(R.drawable.ic_map_pin_cluster_toaster, clusterSize));
-					title = getString(R.string.including_two_toasters, title);
-				} else {
-					icon = BitmapDescriptorFactory.fromBitmap(getClusterBitmap(R.drawable.ic_map_pin_cluster, clusterSize));
-					title = getResources().getQuantityString(R.plurals.count_points, clusterSize, clusterSize);
-				}
-			} else {
-				MarkerData data = (MarkerData)clusterPoint.getPointAtOffset(0).getTag();
-				if (hasTwoToasters) {
-					icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_map_pin_toaster);
-					title = data.getLabel();
-				} else {
-					icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_map_pin);
-					title = getString(R.string.point_number_x, data.getLabel());
-				}
-			}
-			markerOptions.icon(icon);
-			markerOptions.title(title);
-			markerOptions.anchor(0.5f, 1.0f);
-		}
-
-		@SuppressLint("NewApi")
-		private Bitmap getClusterBitmap(int resourceId, int clusterSize) {
-			BitmapFactory.Options options = new BitmapFactory.Options();
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				options.inMutable = true;
-			}
-			Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resourceId, options);
-			if (bitmap.isMutable() == false) {
-				bitmap = bitmap.copy(bitmap.getConfig(), true);
-			}
-
-			Canvas canvas = new Canvas(bitmap);
-
-			Paint paint = null;
-			float originY;
-			if (clusterSize < 100) {
-				paint = clusterPaintLarge;
-				originY = bitmap.getHeight() * 0.64f;
-			} else if (clusterSize < 1000) {
-				paint = clusterPaintMedium;
-				originY = bitmap.getHeight() * 0.6f;
-			} else {
-				paint = clusterPaintSmall;
-				originY = bitmap.getHeight() * 0.56f;
-			}
-
-			canvas.drawText(String.valueOf(clusterSize), bitmap.getWidth() * 0.5f, originY, paint);
-
-			return bitmap;
-		}
-	}
-
 	static class Options implements Serializable {
 
 		private static final long serialVersionUID = 2802382185317730662L;
 
+		// sample app-specific options
 		int markerCount = 100;
+		GeographicDistribution geographicDistribution = GeographicDistribution.NearTwoToasters;
 
+		// clusterkraf library options
 		int transitionDuration = 500;
 		int pixelDistanceToJoinCluster = 100;
 		int zoomToBoundsAnimationDuration = 500;
 		int showInfoWindowAnimationDuration = 500;
 		double expandBoundsFactor = 0.67d;
-
 		SinglePointClickBehavior singlePointClickBehavior = SinglePointClickBehavior.SHOW_INFO_WINDOW;
 		ClusterClickBehavior clusterClickBehavior = ClusterClickBehavior.ZOOM_TO_BOUNDS;
 		ClusterInfoWindowClickBehavior clusterInfoWindowClickBehavior = ClusterInfoWindowClickBehavior.ZOOM_TO_BOUNDS;

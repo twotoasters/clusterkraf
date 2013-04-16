@@ -8,45 +8,68 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.TextView;
 
 import com.twotoasters.clusterkraf.Options.ClusterClickBehavior;
 import com.twotoasters.clusterkraf.Options.ClusterInfoWindowClickBehavior;
+import com.twotoasters.clusterkraf.sample.GenerateRandomMarkersTask.GeographicDistribution;
 
-public class MainActivity extends ExpandableListActivity {
+public class MainActivity extends ExpandableListActivity implements OnChildClickListener {
 
 	private static final int GROUP_DEFAULTS = 0;
 	private static final int GROUP_ADVANCED = 1;
 
 	private final RandomMarkerActivity.Options advancedOptions = new RandomMarkerActivity.Options();
 
+	private String[] advancedLabels;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		advancedLabels = getResources().getStringArray(R.array.advanced_labels);
 		setListAdapter(new Adapter());
+		ExpandableListView elv = getExpandableListView();
+		elv.setOnChildClickListener(this);
 	}
 
 	@Override
 	public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-		Intent i = new Intent(this, RandomMarkerActivity.class);
-		if (isAdvancedStartButton(groupPosition, childPosition)) {
-			// mock options
-			advancedOptions.clusterClickBehavior = ClusterClickBehavior.SHOW_INFO_WINDOW;
-			advancedOptions.clusterInfoWindowClickBehavior = ClusterInfoWindowClickBehavior.ZOOM_TO_BOUNDS;
-			advancedOptions.transitionDuration = 900;
-
-			i.putExtra(RandomMarkerActivity.EXTRA_OPTIONS, advancedOptions);
+		if (isStartButton(groupPosition, childPosition)) {
+			Intent i = new Intent(this, RandomMarkerActivity.class);
+			if (isAdvancedStartButton(groupPosition, childPosition)) {
+				// TODO: chosen instead of mock options
+				advancedOptions.markerCount = 25000;
+				advancedOptions.clusterClickBehavior = ClusterClickBehavior.SHOW_INFO_WINDOW;
+				advancedOptions.clusterInfoWindowClickBehavior = ClusterInfoWindowClickBehavior.ZOOM_TO_BOUNDS;
+				advancedOptions.transitionDuration = 900;
+				advancedOptions.geographicDistribution = GeographicDistribution.Worldwide;
+				advancedOptions.expandBoundsFactor = 0;
+				i.putExtra(RandomMarkerActivity.EXTRA_OPTIONS, advancedOptions);
+			}
+			startActivity(i);
+			return true;
+		} else if (isAdvancedChooser(groupPosition, childPosition)) {
+			// TODO: open appropriate dialog for option
+			return false;
 		}
-		startActivity(i);
-		return true;
+		return false;
+	}
+
+	private boolean isStartButton(int groupPosition, int childPosition) {
+		return isDefaultStartButton(groupPosition, childPosition) || isAdvancedStartButton(groupPosition, childPosition);
+	}
+
+	private boolean isDefaultStartButton(int groupPosition, int childPosition) {
+		return groupPosition == GROUP_DEFAULTS;
 	}
 
 	private boolean isAdvancedChooser(int groupPosition, int childPosition) {
-		return groupPosition == GROUP_ADVANCED && childPosition == 0;
+		return groupPosition == GROUP_ADVANCED && childPosition >= 0 && childPosition < advancedLabels.length;
 	}
 
 	private boolean isAdvancedStartButton(int groupPosition, int childPosition) {
-		return groupPosition == GROUP_ADVANCED && childPosition == 1;
+		return groupPosition == GROUP_ADVANCED && childPosition == advancedLabels.length;
 	}
 
 	private class Adapter extends BaseExpandableListAdapter {
@@ -58,29 +81,26 @@ public class MainActivity extends ExpandableListActivity {
 
 		@Override
 		public long getChildId(int groupPosition, int childPosition) {
-			return (groupPosition * 10) + childPosition;
+			return (groupPosition * 100) + childPosition;
 		}
 
 		@Override
 		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-			View view = convertView;
 			boolean isAdvancedChooser = isAdvancedChooser(groupPosition, childPosition);
-			if (view == null) {
-				LayoutInflater inflater = getLayoutInflater();
-				if (isAdvancedChooser) {
-					view = inflater.inflate(android.R.layout.simple_list_item_1, null);
-					// TODO advanced chooser layout
-				} else {
-					view = inflater.inflate(android.R.layout.simple_list_item_1, null);
-				}
+			View view = null;
+			LayoutInflater inflater = getLayoutInflater();
+			if (isAdvancedChooser) {
+				view = inflater.inflate(android.R.layout.simple_list_item_2, null);
+			} else {
+				view = inflater.inflate(android.R.layout.simple_list_item_1, null);
 			}
 
+			TextView text1 = (TextView)view.findViewById(android.R.id.text1);
 			if (isAdvancedChooser) {
-				TextView tv = (TextView)view.findViewById(android.R.id.text1);
-				tv.setText("TODO: advanced chooser");
-				// TODO: advanced chooser
+				TextView text2 = (TextView)view.findViewById(android.R.id.text2);
+				text1.setText(advancedLabels[childPosition]);
+				text2.setText("TODO: setting goes here");
 			} else {
-				TextView text1 = (TextView)view.findViewById(android.R.id.text1);
 				text1.setText(getResources().getStringArray(R.array.modes_start)[groupPosition]);
 			}
 
@@ -89,7 +109,7 @@ public class MainActivity extends ExpandableListActivity {
 
 		@Override
 		public int getChildrenCount(int groupPosition) {
-			return groupPosition == GROUP_DEFAULTS ? 1 : 2;
+			return groupPosition == GROUP_DEFAULTS ? 1 : advancedLabels.length + 1;
 		}
 
 		@Override
@@ -130,7 +150,7 @@ public class MainActivity extends ExpandableListActivity {
 
 		@Override
 		public boolean isChildSelectable(int groupPosition, int childPosition) {
-			return isAdvancedChooser(groupPosition, childPosition) == false;
+			return true;
 		}
 
 	}
