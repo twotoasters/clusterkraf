@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 import android.view.Window;
 
@@ -60,7 +59,7 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 			setProgressBarIndeterminate(true);
 			setProgressBarIndeterminateVisibility(true);
 
-			new GenerateRandomMarkersTask(this, options.geographicDistribution).execute(options.markerCount);
+			new GenerateRandomMarkersTask(this, options.geographicDistribution).execute(options.pointCount);
 		}
 
 		initMap();
@@ -75,8 +74,8 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 	private void setupActionBar() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			ActionBar actionBar = getActionBar();
-			actionBar.setTitle(getResources().getQuantityString(R.plurals.count_points, options.markerCount,
-					NumberFormat.getInstance().format(options.markerCount)));
+			actionBar.setTitle(getResources().getQuantityString(R.plurals.count_points, options.pointCount,
+					NumberFormat.getInstance().format(options.pointCount)));
 			actionBar.setDisplayHomeAsUpEnabled(true);
 		}
 	}
@@ -85,14 +84,7 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
 			case android.R.id.home:
-				// This ID represents the Home or Up button. In the case of this
-				// activity, the Up button is shown. Use NavUtils to allow users
-				// to navigate up one level in the application structure. For
-				// more details, see the Navigation pattern on Android Design:
-				//
-				// http://developer.android.com/design/patterns/navigation.html#up-vs-back
-				//
-				NavUtils.navigateUpFromSameTask(this);
+				finish();
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -156,7 +148,7 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 	private void initClusterkraf() {
 		if (map != null && inputPoints != null && inputPoints.size() > 0) {
 			com.twotoasters.clusterkraf.Options options = new com.twotoasters.clusterkraf.Options();
-			// TODO: copy settings from this.options
+
 			options.setTransitionDuration(this.options.transitionDuration);
 			options.setPixelDistanceToJoinCluster(this.options.pixelDistanceToJoinCluster);
 			options.setZoomToBoundsAnimationDuration(this.options.zoomToBoundsAnimationDuration);
@@ -184,7 +176,7 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 		private static final long serialVersionUID = 2802382185317730662L;
 
 		// sample app-specific options
-		int markerCount = 100;
+		int pointCount = 100;
 		GeographicDistribution geographicDistribution = GeographicDistribution.NearTwoToasters;
 
 		// clusterkraf library options

@@ -30,11 +30,17 @@
     <string name="show_info_window">Show Info Window</string>
     <string name="no_op">No operation</string>
     
-    <string name="advanced_points_distribution_label">Randomized Points Location</string>
-    <string name="advanced_points_distribution_near_two_toasters">Near Two Toasters</string>
-    <string name="advanced_points_distribution_worldwide">Worldwide</string>
+    <string name="advanced_points_geographic_distribution_label">Geographic Distribution of Randomized Points</string>
+    <string name="advanced_points_geographic_distribution_near_two_toasters">Near Two Toasters</string>
+    <string name="advanced_points_geographic_distribution_worldwide">Worldwide</string>
+    <string-array name="advanced_points_geographic_distribution_options">
+        <item>@string/advanced_points_geographic_distribution_near_two_toasters</item>
+        <item>@string/advanced_points_geographic_distribution_worldwide</item>
+    </string-array>
+    <string name="advanced_points_geographic_distribution_message">Controls where on the planet the random points will appear. Selecting "Near Two Toasters" will yield a higher concentration of points on screen when the camera is inside the appropriate bounds. Selecting "Worldwide" will yield a lower concentration in the same bounds, but we will let you choose a higher number of total points to demonstrate Clusterkraf\'s performance with large, geographically distributed data sets.</string>
     
     <string name="advanced_points_count_label">Points</string>
+    <string name="advanced_points_count_message">The total number of points to generate for clustering. Pro tip: if you select Worldwide Geographic Distribution of Randomized Points, we offer a higher number number of total points to demonstrate Clusterkraf\'s performance with large, geographically distributed data sets.</string>
     
     <string name="advanced_cluster_transition_animation_duration_label">Cluster Transition Animation Duration (ms)</string>
     
@@ -45,6 +51,7 @@
     <string name="advanced_pixel_distance_to_join_cluster_label">Pixel Distance To Join Cluster</string>
     
     <string name="advanced_expand_bounds_factor_label">Expand Bounds Factor (Overdraw)</string>
+    <string name="advanced_expand_bounds_factor_message">TODO: explanation</string>
     
     <string name="advanced_single_point_click_behavior_label">Single Point Click Behavior</string>
     <string name="advanced_single_point_click_behavior_show_info_window">@string/show_info_window</string>
@@ -73,7 +80,7 @@
     </string-array>
     
     <string-array name="advanced_labels">
-        <item>@string/advanced_points_distribution_label</item>
+        <item>@string/advanced_points_geographic_distribution_label</item>
         <item>@string/advanced_points_count_label</item>
         <item>@string/advanced_cluster_transition_animation_duration_label</item>
         <item>@string/advanced_zoom_to_bounds_animation_duration_label</item>
