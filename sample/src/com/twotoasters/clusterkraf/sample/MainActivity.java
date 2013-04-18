@@ -9,6 +9,14 @@ import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AnticipateInterpolator;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
@@ -27,17 +35,21 @@ public class MainActivity extends FragmentActivity implements OnChildClickListen
 	private static final int CHILD_GEOGRAPHIC_DISTRIBUTION = 0;
 	private static final int CHILD_POINTS_COUNT = 1;
 	private static final int CHILD_CLUSTER_TRANSITION_ANIMATION_DURATION = 2;
-	private static final int CHILD_ZOOM_TO_BOUNDS_ANIMATION_DURATION = 3;
-	private static final int CHILD_SHOW_INFO_WINDOW_ANIMATION_DURATION = 4;
-	private static final int CHILD_PIXEL_DISTANCE_TO_JOIN_CLUSTER = 5;
-	private static final int CHILD_EXPAND_BOUNDS_FACTOR = 6;
-	private static final int CHILD_SINGLE_POINT_CLICK_BEHAVIOR = 7;
-	private static final int CHILD_CLUSTER_CLICK_BEHAVIOR = 8;
-	private static final int CHILD_CLUSTER_INFO_WINDOW_CLICK_BEHAVIOR = 9;
+	private static final int CHILD_CLUSTER_TRANSITION_ANIMATION_INTERPOLATOR = 3;
+	private static final int CHILD_ZOOM_TO_BOUNDS_ANIMATION_DURATION = 4;
+	private static final int CHILD_SHOW_INFO_WINDOW_ANIMATION_DURATION = 5;
+	private static final int CHILD_PIXEL_DISTANCE_TO_JOIN_CLUSTER = 6;
+	private static final int CHILD_EXPAND_BOUNDS_FACTOR = 7;
+	private static final int CHILD_SINGLE_POINT_CLICK_BEHAVIOR = 8;
+	private static final int CHILD_CLUSTER_CLICK_BEHAVIOR = 9;
+	private static final int CHILD_CLUSTER_INFO_WINDOW_CLICK_BEHAVIOR = 10;
 
 	private final int[] pointsCountNearTwoToasters = new int[] { 1, 10, 25, 50, 100, 250, 500, 1000, 2500 };
 	private final int[] pointsCountWorldwide = new int[] { 1, 100, 250, 500, 1000, 2500, 5000, 10000, 25000 };
 	private final int[] animationDurations = new int[] { 300, 500, 700, 1000, 2000, 5000, 10000 };
+	private final Class[] interpolators = new Class[] { AccelerateDecelerateInterpolator.class, AccelerateInterpolator.class, AnticipateInterpolator.class,
+			AnticipateOvershootInterpolator.class, BounceInterpolator.class, DecelerateInterpolator.class, LinearInterpolator.class,
+			OvershootInterpolator.class };
 	private final int[] pixelDistanceToJoinCluster = new int[] { 100, 150, 200, 250, 300 };
 	private final double[] expandBoundsFactors = new double[] { 0d, 0.25d, 0.33d, 0.5d, 0.67d, 0.75d, 1.0d };
 
@@ -85,6 +97,9 @@ public class MainActivity extends FragmentActivity implements OnChildClickListen
 					break;
 				case CHILD_CLUSTER_TRANSITION_ANIMATION_DURATION:
 					showClusterTransitionAnimationDurationDialog();
+					break;
+				case CHILD_CLUSTER_TRANSITION_ANIMATION_INTERPOLATOR:
+					showClusterTransitionAnimationInterpolatorDialog();
 					break;
 				case CHILD_ZOOM_TO_BOUNDS_ANIMATION_DURATION:
 					showZoomToBoundsAnimationDurationDialog();
@@ -149,6 +164,15 @@ public class MainActivity extends FragmentActivity implements OnChildClickListen
 
 	private void showClusterTransitionAnimationDurationDialog() {
 		showSingleChoiceDialogFragment(R.string.advanced_cluster_transition_animation_duration_label, animationDurations, advancedOptions.transitionDuration);
+	}
+
+	private void showClusterTransitionAnimationInterpolatorDialog() {
+		String[] options = new String[interpolators.length];
+		for (int i = 0; i < interpolators.length; i++) {
+			options[i] = getShortenedInterpolatorName(interpolators[i].getCanonicalName());
+		}
+		showSingleChoiceDialogFragment(R.string.advanced_cluster_transition_animation_interpolator_label, options,
+				Arrays.asList(options).indexOf(getShortenedInterpolatorName(advancedOptions.transitionInterpolator)));
 	}
 
 	private void showZoomToBoundsAnimationDurationDialog() {
@@ -237,6 +261,8 @@ public class MainActivity extends FragmentActivity implements OnChildClickListen
 			onChangePointsCount(index);
 		} else if (getString(R.string.advanced_cluster_transition_animation_duration_label).equals(tag)) {
 			onChangeClusterTransitionAnimationDuration(index);
+		} else if (getString(R.string.advanced_cluster_transition_animation_interpolator_label).equals(tag)) {
+			onChangeClusterTransitionAnimationInterpolator(index);
 		} else if (getString(R.string.advanced_zoom_to_bounds_animation_duration_label).equals(tag)) {
 			onChangeZoomToBoundsAnimationDuration(index);
 		} else if (getString(R.string.advanced_show_info_window_animation_duration_label).equals(tag)) {
@@ -287,6 +313,10 @@ public class MainActivity extends FragmentActivity implements OnChildClickListen
 		advancedOptions.transitionDuration = animationDurations[index];
 	}
 
+	private void onChangeClusterTransitionAnimationInterpolator(int index) {
+		advancedOptions.transitionInterpolator = interpolators[index].getCanonicalName();
+	}
+
 	private void onChangeZoomToBoundsAnimationDuration(int index) {
 		advancedOptions.zoomToBoundsAnimationDuration = animationDurations[index];
 	}
@@ -313,6 +343,16 @@ public class MainActivity extends FragmentActivity implements OnChildClickListen
 
 	private void onChangeClusterInfoWindowClickBehavior(int index) {
 		advancedOptions.clusterInfoWindowClickBehavior = ClusterInfoWindowClickBehavior.values()[index];
+	}
+
+	private String getShortenedInterpolatorName(String interpolatorCanonicalName) {
+		String shortenedInterpolatorName = "null";
+		try {
+			shortenedInterpolatorName = Class.forName(interpolatorCanonicalName).getSimpleName().replace("Interpolator", "");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return shortenedInterpolatorName;
 	}
 
 	private class Adapter extends BaseExpandableListAdapter {
@@ -354,6 +394,9 @@ public class MainActivity extends FragmentActivity implements OnChildClickListen
 						break;
 					case CHILD_CLUSTER_TRANSITION_ANIMATION_DURATION:
 						setting = nf.format(advancedOptions.transitionDuration);
+						break;
+					case CHILD_CLUSTER_TRANSITION_ANIMATION_INTERPOLATOR:
+						setting = getShortenedInterpolatorName(advancedOptions.transitionInterpolator);
 						break;
 					case CHILD_ZOOM_TO_BOUNDS_ANIMATION_DURATION:
 						setting = nf.format(advancedOptions.zoomToBoundsAnimationDuration);

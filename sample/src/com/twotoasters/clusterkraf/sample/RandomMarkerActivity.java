@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.MenuItem;
 import android.view.Window;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -148,20 +150,33 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 	private void initClusterkraf() {
 		if (map != null && inputPoints != null && inputPoints.size() > 0) {
 			com.twotoasters.clusterkraf.Options options = new com.twotoasters.clusterkraf.Options();
-
-			options.setTransitionDuration(this.options.transitionDuration);
-			options.setPixelDistanceToJoinCluster(this.options.pixelDistanceToJoinCluster);
-			options.setZoomToBoundsAnimationDuration(this.options.zoomToBoundsAnimationDuration);
-			options.setShowInfoWindowAnimationDuration(this.options.showInfoWindowAnimationDuration);
-			options.setExpandBoundsFactor(this.options.expandBoundsFactor);
-			options.setSinglePointClickBehavior(this.options.singlePointClickBehavior);
-			options.setClusterClickBehavior(this.options.clusterClickBehavior);
-			options.setClusterInfoWindowClickBehavior(this.options.clusterInfoWindowClickBehavior);
-
-			options.setMarkerOptionsChooser(new ToastedMarkerOptionsChooser(this, inputPoints.get(0)));
-
+			applyDemoOptionsToClusterkrafOptions(options);
 			clusterkraf = new Clusterkraf(map, options, inputPoints);
 		}
+	}
+
+	private void applyDemoOptionsToClusterkrafOptions(com.twotoasters.clusterkraf.Options options) {
+		options.setTransitionDuration(this.options.transitionDuration);
+		Interpolator interpolator = null;
+		try {
+			interpolator = (Interpolator)Class.forName(this.options.transitionInterpolator).newInstance();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		options.setTransitionInterpolator(interpolator);
+		options.setPixelDistanceToJoinCluster(this.options.pixelDistanceToJoinCluster);
+		options.setZoomToBoundsAnimationDuration(this.options.zoomToBoundsAnimationDuration);
+		options.setShowInfoWindowAnimationDuration(this.options.showInfoWindowAnimationDuration);
+		options.setExpandBoundsFactor(this.options.expandBoundsFactor);
+		options.setSinglePointClickBehavior(this.options.singlePointClickBehavior);
+		options.setClusterClickBehavior(this.options.clusterClickBehavior);
+		options.setClusterInfoWindowClickBehavior(this.options.clusterInfoWindowClickBehavior);
+
+		options.setMarkerOptionsChooser(new ToastedMarkerOptionsChooser(this, inputPoints.get(0)));
 	}
 
 	@Override
@@ -173,14 +188,14 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 
 	static class Options implements Serializable {
 
-		private static final long serialVersionUID = 2802382185317730662L;
-
+		private static final long serialVersionUID = 7492713360265465944L;
 		// sample app-specific options
 		int pointCount = 100;
 		GeographicDistribution geographicDistribution = GeographicDistribution.NearTwoToasters;
 
 		// clusterkraf library options
 		int transitionDuration = 500;
+		String transitionInterpolator = LinearInterpolator.class.getCanonicalName();
 		int pixelDistanceToJoinCluster = 100;
 		int zoomToBoundsAnimationDuration = 500;
 		int showInfoWindowAnimationDuration = 500;

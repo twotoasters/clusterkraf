@@ -44,6 +44,8 @@
     
     <string name="advanced_cluster_transition_animation_duration_label">Cluster Transition Animation Duration (ms)</string>
     
+    <string name="advanced_cluster_transition_animation_interpolator_label">Cluster Transition Animation Interpolator</string>
+    
     <string name="advanced_zoom_to_bounds_animation_duration_label">Zoom To Bounds Animation Duration (ms)</string>
     
     <string name="advanced_show_info_window_animation_duration_label">Show Info Window Animation Duration (ms)</string>
@@ -83,6 +85,7 @@
         <item>@string/advanced_points_geographic_distribution_label</item>
         <item>@string/advanced_points_count_label</item>
         <item>@string/advanced_cluster_transition_animation_duration_label</item>
+        <item>@string/advanced_cluster_transition_animation_interpolator_label</item>
         <item>@string/advanced_zoom_to_bounds_animation_duration_label</item>
         <item>@string/advanced_show_info_window_animation_duration_label</item>
         <item>@string/advanced_pixel_distance_to_join_cluster_label</item>
