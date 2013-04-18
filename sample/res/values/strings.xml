@@ -97,5 +97,10 @@
     
     <string name="point_number_x">Point #%1$s</string>
     <string name="including_two_toasters">%1$s (including Two Toasters)</string>
+    
+    <string name="two_toasters">Two Toasters</string>
+    <string name="two_toasters_heading">We design and develop iOS and Android apps.</string>
+    <string name="two_toasters_logo">Two Toasters Logo</string>    
+    <string name="two_toasters_url">www.twotoasters.com</string>
 
 </resources>

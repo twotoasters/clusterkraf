@@ -35,11 +35,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.twotoasters.clusterkraf.sample.RandomMarkerActivity"
+            android:name="com.twotoasters.clusterkraf.sample.SampleActivity"
             android:parentActivityName="com.twotoasters.clusterkraf.sample.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.twotoasters.clusterkraf.sample.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.twotoasters.clusterkraf.sample.TwoToastersActivity"
+            android:parentActivityName="com.twotoasters.clusterkraf.sample.SampleActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.twotoasters.clusterkraf.sample.SampleActivity" />
         </activity>
 
         <meta-data

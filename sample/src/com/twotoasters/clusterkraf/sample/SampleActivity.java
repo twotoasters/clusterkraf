@@ -1,3 +1,6 @@
+/**
+ * @author Carlton Whitehead
+ */
 package com.twotoasters.clusterkraf.sample;
 
 import java.io.Serializable;
@@ -28,7 +31,7 @@ import com.twotoasters.clusterkraf.Options.ClusterInfoWindowClickBehavior;
 import com.twotoasters.clusterkraf.Options.SinglePointClickBehavior;
 import com.twotoasters.clusterkraf.sample.GenerateRandomMarkersTask.GeographicDistribution;
 
-public class RandomMarkerActivity extends FragmentActivity implements GenerateRandomMarkersTask.Host {
+public class SampleActivity extends FragmentActivity implements GenerateRandomMarkersTask.Host {
 
 	public static final String EXTRA_OPTIONS = "options";
 
@@ -44,7 +47,7 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
-		setContentView(R.layout.activity_random_marker);
+		setContentView(R.layout.activity_sample);
 
 		Intent i = getIntent();
 		if (i != null) {
@@ -66,7 +69,6 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 
 		initMap();
 
-		setupActionBar();
 	}
 
 	/**
@@ -177,6 +179,7 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 		options.setClusterInfoWindowClickBehavior(this.options.clusterInfoWindowClickBehavior);
 
 		options.setMarkerOptionsChooser(new ToastedMarkerOptionsChooser(this, inputPoints.get(0)));
+		options.setOnMarkerClickDownstreamListener(new ToastedOnMarkerClickDownstreamListener(this));
 	}
 
 	@Override
@@ -196,7 +199,7 @@ public class RandomMarkerActivity extends FragmentActivity implements GenerateRa
 		// clusterkraf library options
 		int transitionDuration = 500;
 		String transitionInterpolator = LinearInterpolator.class.getCanonicalName();
-		int pixelDistanceToJoinCluster = 100;
+		int pixelDistanceToJoinCluster = 150;
 		int zoomToBoundsAnimationDuration = 500;
 		int showInfoWindowAnimationDuration = 500;
 		double expandBoundsFactor = 0.67d;

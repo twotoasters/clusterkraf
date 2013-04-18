@@ -1,3 +1,6 @@
+/**
+ * @author Carlton Whitehead
+ */
 package com.twotoasters.clusterkraf.sample;
 
 import java.text.NumberFormat;
@@ -47,13 +50,13 @@ public class MainActivity extends FragmentActivity implements OnChildClickListen
 	private final int[] pointsCountNearTwoToasters = new int[] { 1, 10, 25, 50, 100, 250, 500, 1000, 2500 };
 	private final int[] pointsCountWorldwide = new int[] { 1, 100, 250, 500, 1000, 2500, 5000, 10000, 25000 };
 	private final int[] animationDurations = new int[] { 300, 500, 700, 1000, 2000, 5000, 10000 };
-	private final Class[] interpolators = new Class[] { AccelerateDecelerateInterpolator.class, AccelerateInterpolator.class, AnticipateInterpolator.class,
+	private final Class<?>[] interpolators = new Class[] { AccelerateDecelerateInterpolator.class, AccelerateInterpolator.class, AnticipateInterpolator.class,
 			AnticipateOvershootInterpolator.class, BounceInterpolator.class, DecelerateInterpolator.class, LinearInterpolator.class,
 			OvershootInterpolator.class };
 	private final int[] pixelDistanceToJoinCluster = new int[] { 100, 150, 200, 250, 300 };
 	private final double[] expandBoundsFactors = new double[] { 0d, 0.25d, 0.33d, 0.5d, 0.67d, 0.75d, 1.0d };
 
-	private RandomMarkerActivity.Options advancedOptions;
+	private SampleActivity.Options advancedOptions;
 
 	private String[] advancedLabels;
 
@@ -63,10 +66,10 @@ public class MainActivity extends FragmentActivity implements OnChildClickListen
 		advancedLabels = getResources().getStringArray(R.array.advanced_labels);
 
 		if (savedInstanceState != null) {
-			advancedOptions = (RandomMarkerActivity.Options)savedInstanceState.getSerializable(RandomMarkerActivity.EXTRA_OPTIONS);
+			advancedOptions = (SampleActivity.Options)savedInstanceState.getSerializable(SampleActivity.EXTRA_OPTIONS);
 		} else {
 			if (advancedOptions == null) {
-				advancedOptions = new RandomMarkerActivity.Options();
+				advancedOptions = new SampleActivity.Options();
 			}
 		}
 
@@ -80,9 +83,9 @@ public class MainActivity extends FragmentActivity implements OnChildClickListen
 	@Override
 	public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 		if (isStartButton(groupPosition, childPosition)) {
-			Intent i = new Intent(this, RandomMarkerActivity.class);
+			Intent i = new Intent(this, SampleActivity.class);
 			if (isAdvancedStartButton(groupPosition, childPosition)) {
-				i.putExtra(RandomMarkerActivity.EXTRA_OPTIONS, advancedOptions);
+				i.putExtra(SampleActivity.EXTRA_OPTIONS, advancedOptions);
 			}
 
 			startActivity(i);
@@ -132,7 +135,7 @@ public class MainActivity extends FragmentActivity implements OnChildClickListen
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putSerializable(RandomMarkerActivity.EXTRA_OPTIONS, advancedOptions);
+		outState.putSerializable(SampleActivity.EXTRA_OPTIONS, advancedOptions);
 	}
 
 	private void showGeographicDistributionDialog() {
