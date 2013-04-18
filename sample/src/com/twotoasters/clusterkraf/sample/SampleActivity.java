@@ -4,13 +4,9 @@
 package com.twotoasters.clusterkraf.sample;
 
 import java.io.Serializable;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 
-import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.MenuItem;
@@ -69,19 +65,6 @@ public class SampleActivity extends FragmentActivity implements GenerateRandomMa
 
 		initMap();
 
-	}
-
-	/**
-	 * Set up the {@link android.app.ActionBar}, if the API is available.
-	 */
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	private void setupActionBar() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			ActionBar actionBar = getActionBar();
-			actionBar.setTitle(getResources().getQuantityString(R.plurals.count_points, options.pointCount,
-					NumberFormat.getInstance().format(options.pointCount)));
-			actionBar.setDisplayHomeAsUpEnabled(true);
-		}
 	}
 
 	@Override
