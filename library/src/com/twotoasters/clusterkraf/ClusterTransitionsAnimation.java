@@ -47,7 +47,8 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 				ObjectAnimator animator = ObjectAnimator.ofFloat(this.state, "value", 0f, 1f);
 				animator.addListener(this);
 				animator.addUpdateListener(this);
-				animator.setDuration(optionsRef.get().getTransitionDuration());
+				animator.setDuration(options.getTransitionDuration());
+				animator.setInterpolator(options.getTransitionInterpolator());
 				host.onClusterTransitionStarting();
 				animator.start();
 			}

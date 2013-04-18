@@ -3,6 +3,8 @@
  */
 package com.twotoasters.clusterkraf;
 
+import android.view.animation.Interpolator;
+
 /**
  * specify options for the clusterkraf instance
  */
@@ -10,6 +12,8 @@ public class Options {
 
 	private static final int DEFAULT_TRANSITION_DURATION = 300;
 	private int transitionDuration = DEFAULT_TRANSITION_DURATION;
+
+	private Interpolator transitionInterpolator;
 
 	private static final int DEFAULT_PIXEL_DISTANCE_TO_JOIN_CLUSTER = 150;
 	private int pixelDistanceToJoinCluster = DEFAULT_PIXEL_DISTANCE_TO_JOIN_CLUSTER;
@@ -52,6 +56,21 @@ public class Options {
 	 */
 	public void setTransitionDuration(int transitionDuration) {
 		this.transitionDuration = transitionDuration;
+	}
+
+	/**
+	 * @return the transitionInterpolator
+	 */
+	Interpolator getTransitionInterpolator() {
+		return transitionInterpolator;
+	}
+
+	/**
+	 * @param transitionInterpolator
+	 *            the transitionInterpolator to set
+	 */
+	public void setTransitionInterpolator(Interpolator transitionInterpolator) {
+		this.transitionInterpolator = transitionInterpolator;
 	}
 
 	/**
