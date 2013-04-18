@@ -75,14 +75,6 @@ public class SingleChoiceDialogFragment extends DialogFragment {
 		return dialog;
 	}
 
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		if (activity instanceof Host) {
-			setHost((Host)activity);
-		}
-	}
-
 	public void setHost(Host host) {
 		hostRef = new WeakReference<Host>(host);
 	}
