@@ -19,12 +19,16 @@ public class MainActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		ViewPager pager = (ViewPager)findViewById(R.id.pager);
+		ViewPager pager = getViewPager();
 		pager.setAdapter(new ModeAdapter(getSupportFragmentManager()));
 
 		TabPageIndicator tabPageIndicator = (TabPageIndicator)findViewById(R.id.indicator);
 		tabPageIndicator.setViewPager(pager);
 
+	}
+
+	private ViewPager getViewPager() {
+		return (ViewPager)findViewById(R.id.pager);
 	}
 
 	private class ModeAdapter extends FragmentPagerAdapter {
@@ -38,13 +42,16 @@ public class MainActivity extends FragmentActivity {
 
 		@Override
 		public Fragment getItem(int position) {
+			Fragment fragment = null;
 			switch(position) {
 				case 0:
-					return new NormalModeFragment();
+					fragment = new NormalModeFragment();
+					break;
 				case 1:
 				default:
-					return new AdvancedModeFragment();
+					fragment = new AdvancedModeFragment();
 			}
+			return fragment;
 		}
 
 		@Override
@@ -56,6 +63,7 @@ public class MainActivity extends FragmentActivity {
 		public CharSequence getPageTitle(int position) {
 			return modesLabels[position];
 		}
+
 	}
 
 }

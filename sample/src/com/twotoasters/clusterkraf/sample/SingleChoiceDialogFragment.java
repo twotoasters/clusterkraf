@@ -13,22 +13,25 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 
 public class SingleChoiceDialogFragment extends DialogFragment {
 
 	private WeakReference<Host> hostRef;
 
 	public static final String KEY_TITLE = "title";
-	public static final String KEY_OPTIONS = "options";
-	public static final String KEY_SELECTED_OPTION = "selected option";
+	public static final String KEY_OPTION = "option";
+	public static final String KEY_CHOICES = "choices";
+	public static final String KEY_SELECTION = "selection";
 
 	public SingleChoiceDialogFragment() {
 		// no-op
 	}
 
-	public static SingleChoiceDialogFragment newInstance(Host host, Bundle args) {
+	public static SingleChoiceDialogFragment newInstance(Bundle args) {
 		if (args != null) {
-			if (args.containsKey(KEY_TITLE) == false || args.containsKey(KEY_OPTIONS) == false || args.containsKey(KEY_SELECTED_OPTION) == false) {
+			if (args.containsKey(KEY_TITLE) == false || args.containsKey(KEY_OPTION) == false || args.containsKey(KEY_CHOICES) == false
+					|| args.containsKey(KEY_SELECTION) == false) {
 				throw new RuntimeException("at least one required arg was missing");
 			}
 		} else {
@@ -36,7 +39,6 @@ public class SingleChoiceDialogFragment extends DialogFragment {
 		}
 		SingleChoiceDialogFragment fragment = new SingleChoiceDialogFragment();
 		fragment.setArguments(args);
-		fragment.setHost(host);
 		return fragment;
 	}
 
@@ -46,26 +48,28 @@ public class SingleChoiceDialogFragment extends DialogFragment {
 		Activity activity = getActivity();
 		Bundle args = getArguments();
 		String title = args.getString(KEY_TITLE);
-		String[] options = args.getStringArray(KEY_OPTIONS);
-		if (options == null || options.length == 0) {
-			int[] intOptions = args.getIntArray(KEY_OPTIONS);
-			options = new String[intOptions.length];
+		String[] choices = args.getStringArray(KEY_CHOICES);
+		if (choices == null || choices.length == 0) {
+			int[] intOptions = args.getIntArray(KEY_CHOICES);
+			choices = new String[intOptions.length];
 			NumberFormat nf = NumberFormat.getInstance();
 			for (int i = 0; i < intOptions.length; i++) {
-				options[i] = nf.format(intOptions[i]);
+				choices[i] = nf.format(intOptions[i]);
 			}
 		}
-		int selectedOption = args.getInt(KEY_SELECTED_OPTION);
+		int selection = args.getInt(KEY_SELECTION);
 		if (activity != null) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 			builder.setTitle(title);
-			builder.setSingleChoiceItems(options, selectedOption, new OnClickListener() {
+			builder.setSingleChoiceItems(choices, selection, new OnClickListener() {
 
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					Host host = hostRef.get();
 					if (host != null) {
-						host.onOptionChosen(getTag(), which);
+						host.onOptionChosen(getArguments().getInt(KEY_OPTION), which);
+					} else {
+						throw new RuntimeException("No host");
 					}
 					dialog.dismiss();
 				}
@@ -79,7 +83,18 @@ public class SingleChoiceDialogFragment extends DialogFragment {
 		hostRef = new WeakReference<Host>(host);
 	}
 
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		Fragment parent = getParentFragment();
+		if (parent instanceof Host) {
+			setHost((Host)parent);
+		} else {
+			throw new RuntimeException("Parent fragment must implement Host");
+		}
+	}
+
 	public interface Host {
-		void onOptionChosen(String tag, int index);
+		void onOptionChosen(int option, int index);
 	}
 }

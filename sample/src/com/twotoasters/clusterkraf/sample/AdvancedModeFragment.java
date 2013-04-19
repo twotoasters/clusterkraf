@@ -32,6 +32,7 @@ import com.twotoasters.clusterkraf.Options.ClusterClickBehavior;
 import com.twotoasters.clusterkraf.Options.ClusterInfoWindowClickBehavior;
 import com.twotoasters.clusterkraf.Options.SinglePointClickBehavior;
 import com.twotoasters.clusterkraf.sample.GenerateRandomMarkersTask.GeographicDistribution;
+import com.twotoasters.clusterkraf.sample.SampleActivity.Options;
 
 public class AdvancedModeFragment extends Fragment implements OnItemClickListener, SingleChoiceDialogFragment.Host {
 
@@ -47,6 +48,8 @@ public class AdvancedModeFragment extends Fragment implements OnItemClickListene
 	private static final int CHILD_CLUSTER_CLICK_BEHAVIOR = 9;
 	private static final int CHILD_CLUSTER_INFO_WINDOW_CLICK_BEHAVIOR = 10;
 
+	private static final String TAG_SINGLE_CHOICE_DIALOG_FRAGMENT = SingleChoiceDialogFragment.class.getSimpleName();
+
 	private final int[] pointsCountNearTwoToasters = new int[] { 1, 10, 25, 50, 100, 250, 500, 1000, 2500 };
 	private final int[] pointsCountWorldwide = new int[] { 1, 100, 250, 500, 1000, 2500, 5000, 10000, 25000 };
 	private final int[] animationDurations = new int[] { 300, 500, 700, 1000, 2000, 5000, 10000 };
@@ -56,11 +59,15 @@ public class AdvancedModeFragment extends Fragment implements OnItemClickListene
 	private final int[] pixelDistanceToJoinCluster = new int[] { 100, 150, 200, 250, 300 };
 	private final double[] expandBoundsFactors = new double[] { 0d, 0.25d, 0.33d, 0.5d, 0.67d, 0.75d, 1.0d };
 
-	private final SampleActivity.Options advancedOptions = new SampleActivity.Options();
+	private SampleActivity.Options advancedOptions = new SampleActivity.Options();
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_advanced_mode, null);
+
+		if (savedInstanceState != null) {
+			advancedOptions = (Options)savedInstanceState.getSerializable(SampleActivity.EXTRA_OPTIONS);
+		}
 
 		ListView list = (ListView)view.findViewById(R.id.list);
 		list.setAdapter(new Adapter(getActivity(), getLayoutInflater(savedInstanceState)));
@@ -71,14 +78,10 @@ public class AdvancedModeFragment extends Fragment implements OnItemClickListene
 		return view;
 	}
 
-	private String getShortenedInterpolatorName(String interpolatorCanonicalName) {
-		String shortenedInterpolatorName = "null";
-		try {
-			shortenedInterpolatorName = Class.forName(interpolatorCanonicalName).getSimpleName().replace("Interpolator", "");
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		return shortenedInterpolatorName;
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putSerializable(SampleActivity.EXTRA_OPTIONS, advancedOptions);
 	}
 
 	@Override
@@ -120,31 +123,25 @@ public class AdvancedModeFragment extends Fragment implements OnItemClickListene
 		}
 	}
 
+	private String getShortenedInterpolatorName(String interpolatorCanonicalName) {
+		String shortenedInterpolatorName = "null";
+		try {
+			shortenedInterpolatorName = Class.forName(interpolatorCanonicalName).getSimpleName().replace("Interpolator", "");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return shortenedInterpolatorName;
+	}
+
 	private void showGeographicDistributionDialog() {
-		Bundle args = new Bundle();
-		args.putString(SingleChoiceDialogFragment.KEY_TITLE, getString(R.string.advanced_points_geographic_distribution_label));
-		args.putStringArray(SingleChoiceDialogFragment.KEY_OPTIONS, getResources().getStringArray(R.array.advanced_points_geographic_distribution_options));
-		args.putInt(SingleChoiceDialogFragment.KEY_SELECTED_OPTION, advancedOptions.geographicDistribution == GeographicDistribution.NearTwoToasters ? 0 : 1);
-		SingleChoiceDialogFragment fragment = SingleChoiceDialogFragment.newInstance(this, args);
-		fragment.show(getFragmentManager(), getString(R.string.advanced_points_geographic_distribution_label));
+		showSingleChoiceDialogFragment(R.string.advanced_points_geographic_distribution_label,
+				getResources().getStringArray(R.array.advanced_points_geographic_distribution_options),
+				advancedOptions.geographicDistribution == GeographicDistribution.NearTwoToasters ? 0 : 1);
 	}
 
 	private void showPointsCountDialog() {
-		Bundle args = new Bundle();
-		args.putString(SingleChoiceDialogFragment.KEY_TITLE, getString(R.string.advanced_points_count_label));
-		switch(advancedOptions.geographicDistribution) {
-			case NearTwoToasters:
-				args.putIntArray(SingleChoiceDialogFragment.KEY_OPTIONS, pointsCountNearTwoToasters);
-				args.putInt(SingleChoiceDialogFragment.KEY_SELECTED_OPTION, Arrays.binarySearch(pointsCountNearTwoToasters, advancedOptions.pointCount));
-				break;
-			case Worldwide:
-			default:
-				args.putIntArray(SingleChoiceDialogFragment.KEY_OPTIONS, pointsCountWorldwide);
-				args.putInt(SingleChoiceDialogFragment.KEY_SELECTED_OPTION, Arrays.binarySearch(pointsCountWorldwide, advancedOptions.pointCount));
-				break;
-		}
-		SingleChoiceDialogFragment fragment = SingleChoiceDialogFragment.newInstance(this, args);
-		fragment.show(getFragmentManager(), getString(R.string.advanced_points_count_label));
+		int[] options = advancedOptions.geographicDistribution == GeographicDistribution.NearTwoToasters ? pointsCountNearTwoToasters : pointsCountWorldwide;
+		showSingleChoiceDialogFragment(R.string.advanced_points_count_label, options, advancedOptions.pointCount);
 	}
 
 	private void showClusterTransitionAnimationDurationDialog() {
@@ -202,50 +199,63 @@ public class AdvancedModeFragment extends Fragment implements OnItemClickListene
 				Arrays.binarySearch(ClusterInfoWindowClickBehavior.values(), advancedOptions.clusterInfoWindowClickBehavior));
 	}
 
-	private void showSingleChoiceDialogFragment(int titleId, int[] options, int currentChoice) {
+	private void showSingleChoiceDialogFragment(int titleId, int[] choices, int selection) {
 		Bundle args = new Bundle();
-		String title = getString(titleId);
-		args.putString(SingleChoiceDialogFragment.KEY_TITLE, title);
-		args.putIntArray(SingleChoiceDialogFragment.KEY_OPTIONS, options);
-		args.putInt(SingleChoiceDialogFragment.KEY_SELECTED_OPTION, Arrays.binarySearch(options, currentChoice));
-		SingleChoiceDialogFragment fragment = SingleChoiceDialogFragment.newInstance(this, args);
-		fragment.show(getFragmentManager(), title);
+		args.putString(SingleChoiceDialogFragment.KEY_TITLE, getString(titleId));
+		args.putInt(SingleChoiceDialogFragment.KEY_OPTION, titleId);
+		args.putIntArray(SingleChoiceDialogFragment.KEY_CHOICES, choices);
+		args.putInt(SingleChoiceDialogFragment.KEY_SELECTION, Arrays.binarySearch(choices, selection));
+		SingleChoiceDialogFragment fragment = SingleChoiceDialogFragment.newInstance(args);
+		fragment.show(getChildFragmentManager(), TAG_SINGLE_CHOICE_DIALOG_FRAGMENT);
 	}
 
-	private void showSingleChoiceDialogFragment(int titleId, String[] options, int currentChoiceIndex) {
+	private void showSingleChoiceDialogFragment(int titleId, String[] choices, int selectionIndex) {
 		Bundle args = new Bundle();
-		String title = getString(titleId);
-		args.putString(SingleChoiceDialogFragment.KEY_TITLE, title);
-		args.putStringArray(SingleChoiceDialogFragment.KEY_OPTIONS, options);
-		args.putInt(SingleChoiceDialogFragment.KEY_SELECTED_OPTION, currentChoiceIndex);
-		SingleChoiceDialogFragment fragment = SingleChoiceDialogFragment.newInstance(this, args);
-		fragment.show(getFragmentManager(), title);
+		args.putString(SingleChoiceDialogFragment.KEY_TITLE, getString(titleId));
+		args.putInt(SingleChoiceDialogFragment.KEY_OPTION, titleId);
+		args.putStringArray(SingleChoiceDialogFragment.KEY_CHOICES, choices);
+		args.putInt(SingleChoiceDialogFragment.KEY_SELECTION, selectionIndex);
+		SingleChoiceDialogFragment fragment = SingleChoiceDialogFragment.newInstance(args);
+		fragment.show(getChildFragmentManager(), TAG_SINGLE_CHOICE_DIALOG_FRAGMENT);
 	}
 
 	@Override
-	public void onOptionChosen(String tag, int index) {
-		if (getString(R.string.advanced_points_geographic_distribution_label).equals(tag)) {
-			onChangeGeographicDistribution(index);
-		} else if (getString(R.string.advanced_points_count_label).equals(tag)) {
-			onChangePointsCount(index);
-		} else if (getString(R.string.advanced_cluster_transition_animation_duration_label).equals(tag)) {
-			onChangeClusterTransitionAnimationDuration(index);
-		} else if (getString(R.string.advanced_cluster_transition_animation_interpolator_label).equals(tag)) {
-			onChangeClusterTransitionAnimationInterpolator(index);
-		} else if (getString(R.string.advanced_zoom_to_bounds_animation_duration_label).equals(tag)) {
-			onChangeZoomToBoundsAnimationDuration(index);
-		} else if (getString(R.string.advanced_show_info_window_animation_duration_label).equals(tag)) {
-			onChangeShowInfoWindowAnimationDuration(index);
-		} else if (getString(R.string.advanced_pixel_distance_to_join_cluster_label).equals(tag)) {
-			onChangePixelDistanceToJoinCluster(index);
-		} else if (getString(R.string.advanced_expand_bounds_factor_label).equals(tag)) {
-			onChangeExpandBoundsFactor(index);
-		} else if (getString(R.string.advanced_single_point_click_behavior_label).equals(tag)) {
-			onChangeSinglePointClickBehavior(index);
-		} else if (getString(R.string.advanced_cluster_click_behavior_label).equals(tag)) {
-			onChangeClusterClickBehavior(index);
-		} else if (getString(R.string.advanced_cluster_info_window_click_behavior_label).equals(tag)) {
-			onChangeClusterInfoWindowClickBehavior(index);
+	public void onOptionChosen(int option, int index) {
+		switch(option) {
+			case R.string.advanced_points_geographic_distribution_label:
+				onChangeGeographicDistribution(index);
+				break;
+			case R.string.advanced_points_count_label:
+				onChangePointsCount(index);
+				break;
+			case R.string.advanced_cluster_transition_animation_duration_label:
+				onChangeClusterTransitionAnimationDuration(index);
+				break;
+			case R.string.advanced_cluster_transition_animation_interpolator_label:
+				onChangeClusterTransitionAnimationInterpolator(index);
+				break;
+			case R.string.advanced_zoom_to_bounds_animation_duration_label:
+				onChangeZoomToBoundsAnimationDuration(index);
+				break;
+			case R.string.advanced_show_info_window_animation_duration_label:
+				onChangeShowInfoWindowAnimationDuration(index);
+				break;
+			case R.string.advanced_pixel_distance_to_join_cluster_label:
+				onChangePixelDistanceToJoinCluster(index);
+				break;
+			case R.string.advanced_expand_bounds_factor_label:
+				onChangeExpandBoundsFactor(index);
+				break;
+			case R.string.advanced_single_point_click_behavior_label:
+				onChangeSinglePointClickBehavior(index);
+				break;
+			case R.string.advanced_cluster_click_behavior_label:
+				onChangeClusterClickBehavior(index);
+				break;
+			case R.string.advanced_cluster_info_window_click_behavior_label:
+				onChangeClusterInfoWindowClickBehavior(index);
+				break;
+
 		}
 		View view = getView();
 		if (view != null) {
