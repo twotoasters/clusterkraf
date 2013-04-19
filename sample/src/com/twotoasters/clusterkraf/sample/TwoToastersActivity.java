@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -23,6 +24,16 @@ public class TwoToastersActivity extends FragmentActivity implements OnClickList
 		View logo = findViewById(R.id.two_toasters_logo);
 		logo.setOnClickListener(this);
 		logo.setOnLongClickListener(this);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+			case android.R.id.home:
+				finish();
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override

@@ -31,7 +31,7 @@ import android.widget.TextView;
 import com.twotoasters.clusterkraf.Options.ClusterClickBehavior;
 import com.twotoasters.clusterkraf.Options.ClusterInfoWindowClickBehavior;
 import com.twotoasters.clusterkraf.Options.SinglePointClickBehavior;
-import com.twotoasters.clusterkraf.sample.GenerateRandomMarkersTask.GeographicDistribution;
+import com.twotoasters.clusterkraf.sample.RandomPointsProvider.GeographicDistribution;
 import com.twotoasters.clusterkraf.sample.SampleActivity.Options;
 
 public class AdvancedModeFragment extends Fragment implements OnItemClickListener, SingleChoiceDialogFragment.Host {

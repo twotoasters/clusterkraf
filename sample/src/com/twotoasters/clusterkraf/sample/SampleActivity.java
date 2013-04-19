@@ -25,11 +25,14 @@ import com.twotoasters.clusterkraf.InputPoint;
 import com.twotoasters.clusterkraf.Options.ClusterClickBehavior;
 import com.twotoasters.clusterkraf.Options.ClusterInfoWindowClickBehavior;
 import com.twotoasters.clusterkraf.Options.SinglePointClickBehavior;
-import com.twotoasters.clusterkraf.sample.GenerateRandomMarkersTask.GeographicDistribution;
+import com.twotoasters.clusterkraf.sample.RandomPointsProvider.GenerateCallback;
+import com.twotoasters.clusterkraf.sample.RandomPointsProvider.GeographicDistribution;
 
-public class SampleActivity extends FragmentActivity implements GenerateRandomMarkersTask.Host {
+public class SampleActivity extends FragmentActivity implements GenerateCallback {
 
 	public static final String EXTRA_OPTIONS = "options";
+
+	private static final String KEY_CAMERA_POSITION = "camera position";
 
 	private Options options;
 
@@ -56,15 +59,20 @@ public class SampleActivity extends FragmentActivity implements GenerateRandomMa
 			this.options = new Options();
 		}
 
-		if (options != null) {
+		RandomPointsProvider rpp = RandomPointsProvider.getInstance();
+		ArrayList<InputPoint> inputPoints = rpp.getPoints();
+
+		if (savedInstanceState != null && inputPoints != null) {
+			this.restoreCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
+			this.inputPoints = inputPoints;
+		} else {
 			setProgressBarIndeterminate(true);
 			setProgressBarIndeterminateVisibility(true);
 
-			new GenerateRandomMarkersTask(this, options.geographicDistribution).execute(options.pointCount);
+			rpp.generate(this, options.geographicDistribution, options.pointCount);
 		}
 
 		initMap();
-
 	}
 
 	@Override
@@ -83,7 +91,10 @@ public class SampleActivity extends FragmentActivity implements GenerateRandomMa
 		if (clusterkraf != null) {
 			clusterkraf.clear();
 			clusterkraf = null;
-			map.clear();
+			if (map != null) {
+				map.clear();
+				restoreCameraPosition = map.getCameraPosition();
+			}
 		}
 	}
 
@@ -91,6 +102,17 @@ public class SampleActivity extends FragmentActivity implements GenerateRandomMa
 	protected void onResume() {
 		super.onResume();
 		initMap();
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		if (map != null) {
+			CameraPosition cameraPosition = map.getCameraPosition();
+			if (cameraPosition != null) {
+				outState.putParcelable(KEY_CAMERA_POSITION, cameraPosition);
+			}
+		}
 	}
 
 	private void initMap() {
@@ -123,7 +145,8 @@ public class SampleActivity extends FragmentActivity implements GenerateRandomMa
 					map.moveCamera(CameraUpdateFactory.newCameraPosition(restoreCameraPosition));
 					restoreCameraPosition = null;
 				} else {
-					map.moveCamera(CameraUpdateFactory.newLatLngZoom(inputPoints.get(0).getMapPosition(), 11));
+					float zoom = options.geographicDistribution == GeographicDistribution.NearTwoToasters ? 11 : 4;
+					map.moveCamera(CameraUpdateFactory.newLatLngZoom(inputPoints.get(0).getMapPosition(), zoom));
 				}
 				initClusterkraf();
 			} catch (IllegalStateException ise) {
@@ -166,7 +189,7 @@ public class SampleActivity extends FragmentActivity implements GenerateRandomMa
 	}
 
 	@Override
-	public void onGenerateRandomMarkersTaskPostExecute(ArrayList<InputPoint> inputPoints) {
+	public void onRandomMarkersGenerated(ArrayList<InputPoint> inputPoints) {
 		setProgressBarIndeterminateVisibility(false);
 		this.inputPoints = inputPoints;
 		initMap();
