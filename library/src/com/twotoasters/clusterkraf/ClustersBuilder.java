@@ -70,8 +70,15 @@ class ClustersBuilder {
 		if (bounds != null && options != null) {
 			double expandBoundsFactor = options.getExpandBoundsFactor();
 
+			boolean spans180Meridian = bounds.northeast.longitude < bounds.southwest.longitude;
+
 			double distanceFromNorthToSouth = bounds.northeast.latitude - bounds.southwest.latitude;
-			double distanceFromEastToWest = bounds.northeast.longitude - bounds.southwest.longitude;
+			double distanceFromEastToWest;
+			if (spans180Meridian == false) {
+				distanceFromEastToWest = bounds.northeast.longitude - bounds.southwest.longitude;
+			} else {
+				distanceFromEastToWest = (180 + bounds.northeast.longitude) + (180 - bounds.southwest.longitude);
+			}
 
 			double expandLatitude = distanceFromNorthToSouth * expandBoundsFactor;
 			double expandLongitude = distanceFromEastToWest * expandBoundsFactor;
