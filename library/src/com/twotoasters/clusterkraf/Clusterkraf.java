@@ -215,6 +215,7 @@ public class Clusterkraf {
 		public void onClusteringCameraChange() {
 			Clusterkraf clusterkraf = clusterkrafRef.get();
 			if (clusterkraf != null) {
+				clusterkraf.transitionsAnimation.cancel();
 				clusterkraf.updateClustersAndTransition();
 			}
 		}
@@ -273,8 +274,14 @@ public class Clusterkraf {
 			Clusterkraf clusterkraf = clusterkrafRef.get();
 			if (clusterkraf != null) {
 				ClusterPoint clusterPoint = clusterkraf.currentClusterPointsByMarker.get(marker);
+				if (clusterPoint == null) {
+					clusterPoint = clusterkraf.transitionsAnimation.getDestinationClusterPoint(marker);
+					if (clusterPoint != null) {
+						clusterkraf.transitionsAnimation.cancel();
+					}
+				}
 				OnMarkerClickDownstreamListener downstreamListener = clusterkraf.options.getOnMarkerClickDownstreamListener();
-				if (downstreamListener != null) {
+				if (downstreamListener != null && clusterPoint.isTransition() == false) {
 					handled = downstreamListener.onMarkerClick(marker, clusterPoint);
 				}
 				if (handled == false && clusterPoint != null) {

@@ -5,6 +5,7 @@ package com.twotoasters.clusterkraf;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -25,11 +26,15 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 	private final WeakReference<Options> optionsRef;
 	private final WeakReference<Host> hostRef;
 
+	private ObjectAnimator animator;
 	private AnimatedTransitionState state;
 	private ClusterTransitions transitions;
 
 	private Marker[] animatedMarkers;
 	private Marker[] stationaryMarkers;
+
+	private final HashMap<Marker, AnimatedTransition> animatedTransitionsByMarker = new HashMap<Marker, AnimatedTransition>();
+	private final HashMap<Marker, ClusterPoint> stationaryTransitionsByMarker = new HashMap<Marker, ClusterPoint>();
 
 	ClusterTransitionsAnimation(GoogleMap map, Options options, Host host) {
 		mapRef = new WeakReference<GoogleMap>(map);
@@ -44,7 +49,7 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 			if (options != null && host != null) {
 				this.state = new AnimatedTransitionState(transitions.animated);
 				this.transitions = transitions;
-				ObjectAnimator animator = ObjectAnimator.ofFloat(this.state, "value", 0f, 1f);
+				animator = ObjectAnimator.ofFloat(this.state, "value", 0f, 1f);
 				animator.addListener(this);
 				animator.addUpdateListener(this);
 				animator.setDuration(options.getTransitionDuration());
@@ -52,6 +57,20 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 				host.onClusterTransitionStarting();
 				animator.start();
 			}
+		}
+	}
+
+	ClusterPoint getDestinationClusterPoint(Marker marker) {
+		AnimatedTransition animatedTransition = animatedTransitionsByMarker.get(marker);
+		if (animatedTransition != null) {
+			return animatedTransition.getDestinationClusterPoint();
+		}
+		return stationaryTransitionsByMarker.get(marker);
+	}
+
+	void cancel() {
+		if (animator != null) {
+			animator.cancel();
 		}
 	}
 
@@ -164,8 +183,12 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 			int animatedTransitionCount = animatedTransitions.size();
 			animatedMarkers = new Marker[animatedTransitionCount];
 			for (int i = 0; i < animatedTransitionCount; i++) {
-				ClusterPoint origin = animatedTransitions.get(i).getOriginClusterRelevantInputPoints();
-				animatedMarkers[i] = addMarker(map, moc, origin);
+				AnimatedTransition animatedTransition = animatedTransitions.get(i);
+				ClusterPoint origin = animatedTransition.getOriginClusterRelevantInputPoints();
+				Marker marker = addMarker(map, moc, origin);
+
+				animatedMarkers[i] = marker;
+				animatedTransitionsByMarker.put(marker, animatedTransition);
 			}
 
 			// plot stationary clusters
@@ -175,7 +198,10 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 				stationaryMarkers = new Marker[stationaryClusterCount];
 				for (int i = 0; i < stationaryClusterCount; i++) {
 					ClusterPoint stationaryCluster = stationaryClusters.get(i);
-					stationaryMarkers[i] = addMarker(map, moc, stationaryCluster);
+					Marker marker = addMarker(map, moc, stationaryCluster);
+
+					stationaryMarkers[i] = marker;
+					stationaryTransitionsByMarker.put(marker, stationaryCluster);
 				}
 			}
 		}
@@ -201,6 +227,9 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 
 		state = null;
 		transitions = null;
+		animatedTransitionsByMarker.clear();
+		stationaryTransitionsByMarker.clear();
+		animator = null;
 	}
 
 	private Marker addMarker(GoogleMap map, MarkerOptionsChooser moc, ClusterPoint clusterPoint) {
