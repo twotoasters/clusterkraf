@@ -208,7 +208,7 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 		int pixelDistanceToJoinCluster = 150;
 		int zoomToBoundsAnimationDuration = 500;
 		int showInfoWindowAnimationDuration = 500;
-		double expandBoundsFactor = 0.67d;
+		double expandBoundsFactor = 0.5d;
 		SinglePointClickBehavior singlePointClickBehavior = SinglePointClickBehavior.SHOW_INFO_WINDOW;
 		ClusterClickBehavior clusterClickBehavior = ClusterClickBehavior.ZOOM_TO_BOUNDS;
 		ClusterInfoWindowClickBehavior clusterInfoWindowClickBehavior = ClusterInfoWindowClickBehavior.ZOOM_TO_BOUNDS;
