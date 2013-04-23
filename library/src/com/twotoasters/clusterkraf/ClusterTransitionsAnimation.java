@@ -60,11 +60,15 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 		}
 	}
 
-	ClusterPoint getDestinationClusterPoint(Marker marker) {
+	ClusterPoint getAnimatedDestinationClusterPoint(Marker marker) {
 		AnimatedTransition animatedTransition = animatedTransitionsByMarker.get(marker);
 		if (animatedTransition != null) {
 			return animatedTransition.getDestinationClusterPoint();
 		}
+		return null;
+	}
+
+	ClusterPoint getStationaryClusterPoint(Marker marker) {
 		return stationaryTransitionsByMarker.get(marker);
 	}
 

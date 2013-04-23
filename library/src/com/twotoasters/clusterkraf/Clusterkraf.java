@@ -24,7 +24,7 @@ public class Clusterkraf {
 	private final Options options;
 	private final ClusterTransitionsAnimation transitionsAnimation;
 
-	private final InnerCallbackListener innerCallbackListener = new InnerCallbackListener(this);
+	private final InnerCallbackListener innerCallbackListener;
 
 	private final ArrayList<InputPoint> points = new ArrayList<InputPoint>();
 	private ArrayList<ClusterPoint> currentClusters;
@@ -45,6 +45,7 @@ public class Clusterkraf {
 	public Clusterkraf(GoogleMap map, Options options, ArrayList<InputPoint> points) {
 		this.mapRef = new WeakReference<GoogleMap>(map);
 		this.options = options;
+		this.innerCallbackListener = new InnerCallbackListener(this);
 		this.transitionsAnimation = new ClusterTransitionsAnimation(map, options, innerCallbackListener);
 
 		if (points != null) {
@@ -160,20 +161,20 @@ public class Clusterkraf {
 	public void zoomToBounds(ClusterPoint clusterPoint) {
 		GoogleMap map = mapRef.get();
 		if (map != null && clusterPoint != null) {
-			innerCallbackListener.clusteringOnCameraChangeListener.setDirty(true);
+			innerCallbackListener.clusteringOnCameraChangeListener.setDirty(System.currentTimeMillis());
 			CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(clusterPoint.getBoundsOfInputPoints(), options.getZoomToBoundsPadding());
 			map.animateCamera(cameraUpdate, options.getZoomToBoundsAnimationDuration(), null);
 			/*
 			 * TODO : ClusteringCancelableCallback
 			 */
-			innerCallbackListener.clusteringOnCameraChangeListener.setDirty(false);
 		}
 	}
 
 	public void showInfoWindow(Marker marker, ClusterPoint clusterPoint) {
 		GoogleMap map = mapRef.get();
 		if (map != null && marker != null && clusterPoint != null) {
-			innerCallbackListener.clusteringOnCameraChangeListener.setDirty(true);
+			long dirtyUntil = System.currentTimeMillis() + options.getShowInfoWindowAnimationDuration();
+			innerCallbackListener.clusteringOnCameraChangeListener.setDirty(dirtyUntil);
 			CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(marker.getPosition());
 			map.animateCamera(cameraUpdate, options.getShowInfoWindowAnimationDuration(), new CancelableCallback() {
 
@@ -183,7 +184,7 @@ public class Clusterkraf {
 
 						@Override
 						public void run() {
-							innerCallbackListener.clusteringOnCameraChangeListener.setDirty(false);
+							innerCallbackListener.clusteringOnCameraChangeListener.setDirty(0);
 
 						}
 					});
@@ -191,7 +192,7 @@ public class Clusterkraf {
 
 				@Override
 				public void onCancel() {
-					innerCallbackListener.clusteringOnCameraChangeListener.setDirty(false);
+					innerCallbackListener.clusteringOnCameraChangeListener.setDirty(0);
 				}
 			});
 			marker.showInfoWindow();
@@ -207,9 +208,10 @@ public class Clusterkraf {
 
 		private InnerCallbackListener(Clusterkraf clusterkraf) {
 			clusterkrafRef = new WeakReference<Clusterkraf>(clusterkraf);
+			clusteringOnCameraChangeListener = new ClusteringOnCameraChangeListener(this, clusterkraf.options);
 		}
 
-		private final ClusteringOnCameraChangeListener clusteringOnCameraChangeListener = new ClusteringOnCameraChangeListener(this);
+		private final ClusteringOnCameraChangeListener clusteringOnCameraChangeListener;
 
 		@Override
 		public void onClusteringCameraChange() {
@@ -228,7 +230,7 @@ public class Clusterkraf {
 		 */
 		@Override
 		public void onClusterTransitionStarting() {
-			clusteringOnCameraChangeListener.setDirty(true);
+			clusteringOnCameraChangeListener.setDirty(System.currentTimeMillis());
 		}
 
 		/*
@@ -258,7 +260,7 @@ public class Clusterkraf {
 				clusterkraf.drawMarkers();
 				clusterkraf.transitionsAnimation.onHostPlottedDestinationClusterPoints();
 			}
-			clusteringOnCameraChangeListener.setDirty(false);
+			clusteringOnCameraChangeListener.setDirty(0);
 		}
 
 		/*
@@ -271,20 +273,23 @@ public class Clusterkraf {
 		@Override
 		public boolean onMarkerClick(Marker marker) {
 			boolean handled = false;
+			boolean exempt = false;
 			Clusterkraf clusterkraf = clusterkrafRef.get();
 			if (clusterkraf != null) {
 				ClusterPoint clusterPoint = clusterkraf.currentClusterPointsByMarker.get(marker);
 				if (clusterPoint == null) {
-					clusterPoint = clusterkraf.transitionsAnimation.getDestinationClusterPoint(marker);
-					if (clusterPoint != null) {
-						clusterkraf.transitionsAnimation.cancel();
+					if (clusterkraf.transitionsAnimation.getAnimatedDestinationClusterPoint(marker) != null) {
+						exempt = true;
+						// animated marker click is not supported
+					} else {
+						clusterPoint = clusterkraf.transitionsAnimation.getStationaryClusterPoint(marker);
 					}
 				}
 				OnMarkerClickDownstreamListener downstreamListener = clusterkraf.options.getOnMarkerClickDownstreamListener();
-				if (downstreamListener != null && clusterPoint.isTransition() == false) {
+				if (exempt == false && downstreamListener != null) {
 					handled = downstreamListener.onMarkerClick(marker, clusterPoint);
 				}
-				if (handled == false && clusterPoint != null) {
+				if (exempt == false && handled == false && clusterPoint != null) {
 					if (clusterPoint.size() > 1) {
 						switch(clusterkraf.options.getClusterClickBehavior()) {
 							case ZOOM_TO_BOUNDS:
@@ -312,7 +317,7 @@ public class Clusterkraf {
 					}
 				}
 			}
-			return handled;
+			return handled || exempt;
 		}
 
 		/*

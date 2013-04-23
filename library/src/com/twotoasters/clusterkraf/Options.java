@@ -43,6 +43,8 @@ public class Options {
 
 	private SinglePointInfoWindowClickBehavior singlePointInfoWindowClickBehavior = SinglePointInfoWindowClickBehavior.HIDE_INFO_WINDOW;
 
+	private long clusteringOnCameraChangeListenerDirtyLifetimeMillis = 200l;
+
 	/**
 	 * @return the transitionDuration
 	 */
@@ -250,6 +252,17 @@ public class Options {
 	 */
 	public void setSinglePointInfoWindowClickBehavior(SinglePointInfoWindowClickBehavior singlePointInfoWindowClickBehavior) {
 		this.singlePointInfoWindowClickBehavior = singlePointInfoWindowClickBehavior;
+	}
+
+	/**
+	 * @return the clusteringOnCameraChangeListenerDirtyLifetimeMillis
+	 */
+	long getClusteringOnCameraChangeListenerDirtyLifetimeMillis() {
+		return clusteringOnCameraChangeListenerDirtyLifetimeMillis;
+	}
+
+	public void setClusteringOnCameraChangeListenerDirtyLifetimeMillis(long clusteringOnCameraChangeListenerDirtyLifetimeMillis) {
+		this.clusteringOnCameraChangeListenerDirtyLifetimeMillis = clusteringOnCameraChangeListenerDirtyLifetimeMillis;
 	}
 
 	public enum ClusterClickBehavior {
