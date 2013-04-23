@@ -4,10 +4,10 @@
     <string name="app_name">Clusterkraf Sample</string>
     
     <string name="mode_normal_label">Normal Mode</string>
-    <string name="mode_normal_start">Start in normal mode</string>
+    <string name="mode_normal_start">Start Normal Mode</string>
     
     <string name="mode_advanced_label">Advanced Mode</string>
-    <string name="mode_advanced_start">Start in advanced mode</string>
+    <string name="mode_advanced_start">Start Advanced Mode</string>
     
     <string-array name="modes_labels">
         <item>@string/mode_normal_label</item>
@@ -19,7 +19,7 @@
         <item>@string/mode_advanced_start</item>
     </string-array>
     
-    <string name="mode_descriptions">Start in normal mode to quickly try Clusterkraf, or check out Advanced Mode to see how its different options affect the experience.</string>
+    <string name="mode_descriptions">Start in Normal Mode to quickly try Clusterkraf, or check out Advanced Mode to see how each option affects the experience.</string>
     
     <string name="zoom_to_bounds">Zoom To Bounds</string>
     <string name="show_info_window">Show Info Window</string>
