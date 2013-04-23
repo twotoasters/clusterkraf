@@ -21,7 +21,8 @@ public class SingleChoiceDialogFragment extends DialogFragment {
 
 	public static final String KEY_TITLE = "title";
 	public static final String KEY_OPTION = "option";
-	public static final String KEY_CHOICES = "choices";
+	public static final String KEY_CHOICES_STRINGS = "choices strings";
+	public static final String KEY_CHOICES_INTS = "choices ints";
 	public static final String KEY_SELECTION = "selection";
 
 	public SingleChoiceDialogFragment() {
@@ -30,7 +31,8 @@ public class SingleChoiceDialogFragment extends DialogFragment {
 
 	public static SingleChoiceDialogFragment newInstance(Bundle args) {
 		if (args != null) {
-			if (args.containsKey(KEY_TITLE) == false || args.containsKey(KEY_OPTION) == false || args.containsKey(KEY_CHOICES) == false
+			if (args.containsKey(KEY_TITLE) == false || args.containsKey(KEY_OPTION) == false
+					|| (args.containsKey(KEY_CHOICES_STRINGS) == false && args.containsKey(KEY_CHOICES_INTS) == false)
 					|| args.containsKey(KEY_SELECTION) == false) {
 				throw new RuntimeException("at least one required arg was missing");
 			}
@@ -48,13 +50,15 @@ public class SingleChoiceDialogFragment extends DialogFragment {
 		Activity activity = getActivity();
 		Bundle args = getArguments();
 		String title = args.getString(KEY_TITLE);
-		String[] choices = args.getStringArray(KEY_CHOICES);
-		if (choices == null || choices.length == 0) {
-			int[] intOptions = args.getIntArray(KEY_CHOICES);
-			choices = new String[intOptions.length];
+		String[] choices = new String[0];
+		if (args.containsKey(KEY_CHOICES_STRINGS)) {
+			choices = args.getStringArray(KEY_CHOICES_STRINGS);
+		} else if (args.containsKey(KEY_CHOICES_INTS)) {
+			int[] choicesInts = args.getIntArray(KEY_CHOICES_INTS);
+			choices = new String[choicesInts.length];
 			NumberFormat nf = NumberFormat.getInstance();
-			for (int i = 0; i < intOptions.length; i++) {
-				choices[i] = nf.format(intOptions[i]);
+			for (int i = 0; i < choicesInts.length; i++) {
+				choices[i] = nf.format(choicesInts[i]);
 			}
 		}
 		int selection = args.getInt(KEY_SELECTION);

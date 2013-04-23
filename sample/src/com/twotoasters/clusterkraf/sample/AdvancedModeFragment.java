@@ -203,7 +203,7 @@ public class AdvancedModeFragment extends Fragment implements OnItemClickListene
 		Bundle args = new Bundle();
 		args.putString(SingleChoiceDialogFragment.KEY_TITLE, getString(titleId));
 		args.putInt(SingleChoiceDialogFragment.KEY_OPTION, titleId);
-		args.putIntArray(SingleChoiceDialogFragment.KEY_CHOICES, choices);
+		args.putIntArray(SingleChoiceDialogFragment.KEY_CHOICES_INTS, choices);
 		args.putInt(SingleChoiceDialogFragment.KEY_SELECTION, Arrays.binarySearch(choices, selection));
 		SingleChoiceDialogFragment fragment = SingleChoiceDialogFragment.newInstance(args);
 		fragment.show(getChildFragmentManager(), TAG_SINGLE_CHOICE_DIALOG_FRAGMENT);
@@ -213,7 +213,7 @@ public class AdvancedModeFragment extends Fragment implements OnItemClickListene
 		Bundle args = new Bundle();
 		args.putString(SingleChoiceDialogFragment.KEY_TITLE, getString(titleId));
 		args.putInt(SingleChoiceDialogFragment.KEY_OPTION, titleId);
-		args.putStringArray(SingleChoiceDialogFragment.KEY_CHOICES, choices);
+		args.putStringArray(SingleChoiceDialogFragment.KEY_CHOICES_STRINGS, choices);
 		args.putInt(SingleChoiceDialogFragment.KEY_SELECTION, selectionIndex);
 		SingleChoiceDialogFragment fragment = SingleChoiceDialogFragment.newInstance(args);
 		fragment.show(getChildFragmentManager(), TAG_SINGLE_CHOICE_DIALOG_FRAGMENT);
