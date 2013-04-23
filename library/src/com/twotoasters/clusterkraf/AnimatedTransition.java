@@ -13,6 +13,7 @@ class AnimatedTransition {
 	private final ClusterPoint originClusterPoint;
 	private final ClusterPoint originClusterRelevantInputPoints;
 	private final ClusterPoint destinationClusterPoint;
+	private final boolean spans180Meridian;
 
 	AnimatedTransition(Projection projection, ClusterPoint originClusterPoint, InputPoint firstRelevantInputPointFromOriginClusterPoint,
 			ClusterPoint destinationClusterPoint) {
@@ -25,6 +26,8 @@ class AnimatedTransition {
 		this.originClusterRelevantInputPoints.setScreenPosition(originClusterPoint.getScreenPosition());
 
 		this.destinationClusterPoint = destinationClusterPoint;
+
+		this.spans180Meridian = Math.abs((originClusterPoint.getMapPosition().longitude) - (destinationClusterPoint.getMapPosition().longitude)) > 180;
 	}
 
 	boolean originContains(InputPoint point) {
@@ -45,5 +48,9 @@ class AnimatedTransition {
 
 	void addOriginClusterRelevantInputPoint(InputPoint previousInputPoint) {
 		originClusterRelevantInputPoints.add(previousInputPoint);
+	}
+
+	public boolean spans180Meridian() {
+		return spans180Meridian;
 	}
 }

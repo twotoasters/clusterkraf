@@ -104,7 +104,15 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 				LatLng start = transition.getOriginClusterRelevantInputPoints().getMapPosition();
 				LatLng end = transition.getDestinationClusterPoint().getMapPosition();
 				double currentLat = start.latitude + (value * (end.latitude - start.latitude));
-				double currentLon = start.longitude + (value * (end.longitude - start.longitude));
+				double currentLon;
+				if (transition.spans180Meridian() == false) {
+					currentLon = start.longitude + (value * (end.longitude - start.longitude));
+				} else {
+					double shiftedStartLon = start.longitude < 0 ? start.longitude + 360 : start.longitude;
+					double shiftedEndLon = end.longitude < 0 ? end.longitude + 360 : end.longitude;
+					double shiftedCurrentLon = shiftedStartLon + (value * (shiftedEndLon - shiftedStartLon));
+					currentLon = shiftedCurrentLon - 360;
+				}
 				positions[i++] = new LatLng(currentLat, currentLon);
 			}
 			return positions;
