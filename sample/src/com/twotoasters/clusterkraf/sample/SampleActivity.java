@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.animation.Interpolator;
@@ -176,7 +177,7 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 			e.printStackTrace();
 		}
 		options.setTransitionInterpolator(interpolator);
-		options.setPixelDistanceToJoinCluster(this.options.pixelDistanceToJoinCluster);
+		options.setPixelDistanceToJoinCluster(getPixelDistanceToJoinCluster());
 		options.setZoomToBoundsAnimationDuration(this.options.zoomToBoundsAnimationDuration);
 		options.setShowInfoWindowAnimationDuration(this.options.showInfoWindowAnimationDuration);
 		options.setExpandBoundsFactor(this.options.expandBoundsFactor);
@@ -184,8 +185,20 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 		options.setClusterClickBehavior(this.options.clusterClickBehavior);
 		options.setClusterInfoWindowClickBehavior(this.options.clusterInfoWindowClickBehavior);
 
+		options.setZoomToBoundsPadding(getResources().getDrawable(R.drawable.ic_map_pin_cluster).getIntrinsicHeight());
+
 		options.setMarkerOptionsChooser(new ToastedMarkerOptionsChooser(this, inputPoints.get(0)));
 		options.setOnMarkerClickDownstreamListener(new ToastedOnMarkerClickDownstreamListener(this));
+	}
+
+	private int getPixelDistanceToJoinCluster() {
+		return convertDeviceIndependentPixelsToPixels(this.options.dipDistanceToJoinCluster);
+	}
+
+	private int convertDeviceIndependentPixelsToPixels(int dip) {
+		DisplayMetrics displayMetrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+		return Math.round(displayMetrics.density * dip);
 	}
 
 	@Override
@@ -205,7 +218,7 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 		// clusterkraf library options
 		int transitionDuration = 500;
 		String transitionInterpolator = LinearInterpolator.class.getCanonicalName();
-		int pixelDistanceToJoinCluster = 150;
+		int dipDistanceToJoinCluster = 100;
 		int zoomToBoundsAnimationDuration = 500;
 		int showInfoWindowAnimationDuration = 500;
 		double expandBoundsFactor = 0.5d;

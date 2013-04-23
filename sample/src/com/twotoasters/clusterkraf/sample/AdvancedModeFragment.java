@@ -56,7 +56,7 @@ public class AdvancedModeFragment extends Fragment implements OnItemClickListene
 	private final Class<?>[] interpolators = new Class[] { AccelerateDecelerateInterpolator.class, AccelerateInterpolator.class, AnticipateInterpolator.class,
 			AnticipateOvershootInterpolator.class, BounceInterpolator.class, DecelerateInterpolator.class, LinearInterpolator.class,
 			OvershootInterpolator.class };
-	private final int[] pixelDistanceToJoinCluster = new int[] { 100, 150, 200, 250, 300 };
+	private final int[] dipDistanceToJoinCluster = new int[] { 75, 100, 125, 150, 200, 250 };
 	private final double[] expandBoundsFactors = new double[] { 0d, 0.25d, 0.33d, 0.5d, 0.67d, 0.75d, 1.0d };
 
 	private SampleActivity.Options advancedOptions = new SampleActivity.Options();
@@ -168,8 +168,8 @@ public class AdvancedModeFragment extends Fragment implements OnItemClickListene
 	}
 
 	private void showPixelDistanceToJoinClusterDialog() {
-		showSingleChoiceDialogFragment(R.string.advanced_pixel_distance_to_join_cluster_label, pixelDistanceToJoinCluster,
-				advancedOptions.pixelDistanceToJoinCluster);
+		showSingleChoiceDialogFragment(R.string.advanced_pixel_distance_to_join_cluster_label, dipDistanceToJoinCluster,
+				advancedOptions.dipDistanceToJoinCluster);
 	}
 
 	private void showExpandBoundsFactorDialog() {
@@ -308,7 +308,7 @@ public class AdvancedModeFragment extends Fragment implements OnItemClickListene
 	}
 
 	private void onChangePixelDistanceToJoinCluster(int index) {
-		advancedOptions.pixelDistanceToJoinCluster = pixelDistanceToJoinCluster[index];
+		advancedOptions.dipDistanceToJoinCluster = dipDistanceToJoinCluster[index];
 	}
 
 	private void onChangeExpandBoundsFactor(int index) {
@@ -370,7 +370,7 @@ public class AdvancedModeFragment extends Fragment implements OnItemClickListene
 					setting = nf.format(advancedOptions.showInfoWindowAnimationDuration);
 					break;
 				case CHILD_PIXEL_DISTANCE_TO_JOIN_CLUSTER:
-					setting = nf.format(advancedOptions.pixelDistanceToJoinCluster);
+					setting = nf.format(advancedOptions.dipDistanceToJoinCluster);
 					break;
 				case CHILD_EXPAND_BOUNDS_FACTOR:
 					setting = nf.format(advancedOptions.expandBoundsFactor);

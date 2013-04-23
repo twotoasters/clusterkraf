@@ -45,7 +45,7 @@
     
     <string name="advanced_show_info_window_animation_duration_label">Show Info Window Animation Duration (ms)</string>
     
-    <string name="advanced_pixel_distance_to_join_cluster_label">Pixel Distance To Join Cluster</string>
+    <string name="advanced_pixel_distance_to_join_cluster_label">Distance To Join Cluster (dip)</string>
     
     <string name="advanced_expand_bounds_factor_label">Expand Bounds Factor (Overdraw)</string>
     <string name="advanced_expand_bounds_factor_message">TODO: explanation</string>
