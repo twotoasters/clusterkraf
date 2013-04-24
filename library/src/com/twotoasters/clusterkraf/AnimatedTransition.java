@@ -50,7 +50,7 @@ class AnimatedTransition {
 		originClusterRelevantInputPoints.add(previousInputPoint);
 	}
 
-	public boolean spans180Meridian() {
+	boolean spans180Meridian() {
 		return spans180Meridian;
 	}
 }
