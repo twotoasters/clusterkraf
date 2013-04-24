@@ -1,6 +1,3 @@
-/**
- * @author Carlton Whitehead
- */
 package com.twotoasters.clusterkraf;
 
 import android.graphics.Point;
@@ -9,23 +6,23 @@ import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.twotoasters.clusterkraf.util.Distance;
 
-/**
- *
- */
-public abstract class BasePoint {
+abstract class BasePoint {
 
 	protected LatLng mapPosition;
 	private Point screenPosition;
 
+	/**
+	 * @return the latitude/longitude coordinate of the point on the map
+	 */
 	public LatLng getMapPosition() {
 		return mapPosition;
 	}
 
-	public Point getScreenPosition() {
+	Point getScreenPosition() {
 		return screenPosition;
 	}
 
-	public boolean hasScreenPosition() {
+	boolean hasScreenPosition() {
 		return screenPosition != null;
 	}
 

@@ -1,6 +1,3 @@
-/**
- * @author Carlton Whitehead
- */
 package com.twotoasters.clusterkraf;
 
 import java.lang.ref.WeakReference;
@@ -9,9 +6,6 @@ import java.util.ArrayList;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 
-/**
- *
- */
 class ClusterTransitions {
 
 	final ArrayList<AnimatedTransition> animated;

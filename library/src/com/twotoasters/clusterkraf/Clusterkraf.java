@@ -1,6 +1,3 @@
-/**
- * @author Carlton Whitehead
- */
 package com.twotoasters.clusterkraf;
 
 import java.lang.ref.WeakReference;
@@ -18,6 +15,9 @@ import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+/**
+ * Clusters InputPoint objects on a GoogleMap
+ */
 public class Clusterkraf {
 
 	private final WeakReference<GoogleMap> mapRef;
@@ -34,13 +34,13 @@ public class Clusterkraf {
 	private ArrayList<Marker> previousMarkers;
 
 	/**
-	 * construct a Clusterkraf instance to manage your map with customized
-	 * options.
+	 * Construct a Clusterkraf instance to manage your map with customized
+	 * options and a list of points
 	 * 
 	 * @param map
-	 *            the GoogleMap to be managed by Clusterkraf
+	 *            The GoogleMap to be managed by Clusterkraf
 	 * @param options
-	 *            customized options
+	 *            Customized options
 	 */
 	public Clusterkraf(GoogleMap map, Options options, ArrayList<InputPoint> points) {
 		this.mapRef = new WeakReference<GoogleMap>(map);
@@ -55,13 +55,26 @@ public class Clusterkraf {
 		showAllClusters();
 	}
 
+	/**
+	 * Add a single InputPoint for clustering
+	 * 
+	 * @param inputPoint
+	 *            The InputPoint object to be clustered
+	 */
 	public void add(InputPoint inputPoint) {
+		// @TODO: test individually adding points
 		if (inputPoint != null) {
 			points.add(inputPoint);
 			updateClustersAndTransition();
 		}
 	}
 
+	/**
+	 * Add a list of InputPoint objects for clustering
+	 * 
+	 * @param inputPoints
+	 *            The list of InputPoint objects for clustering
+	 */
 	public void addAll(ArrayList<InputPoint> inputPoints) {
 		if (inputPoints != null) {
 			points.addAll(inputPoints);
@@ -69,18 +82,28 @@ public class Clusterkraf {
 		}
 	}
 
+	/**
+	 * Remove all existing InputPoint objects and add a new list of InputPoint
+	 * objects for clustering
+	 * 
+	 * @param inputPoints
+	 *            The new list of InputPoint objects for clustering
+	 */
 	public void replace(ArrayList<InputPoint> inputPoints) {
 		clear();
 		addAll(inputPoints);
 	}
 
 	/**
-	 * remove markers from the map
+	 * Remove all Clusterkraf-managed markers from the map
 	 */
 	public void clear() {
-		// we avoid GoogleMap.clear() because the current SDK leaks custom
-		// bitmaps, see:
-		// http://code.google.com/p/gmaps-api-issues/issues/detail?id=4703
+		/**
+		 * we avoid GoogleMap.clear() so users can manage their own
+		 * non-clustered markers on the map.
+		 * 
+		 * @see http://code.google.com/p/gmaps-api-issues/issues/detail?id=4703
+		 */
 		for (Marker marker : currentMarkers) {
 			marker.remove();
 		}
@@ -89,7 +112,7 @@ public class Clusterkraf {
 		points.clear();
 	}
 
-	// TODO: support removing individual markers by InputPoint
+	// TODO: support removing individual InputPoint objects
 
 	private void buildClusters() {
 		GoogleMap map = mapRef.get();
@@ -105,12 +128,12 @@ public class Clusterkraf {
 		if (map != null && currentClusters != null) {
 			currentMarkers = new ArrayList<Marker>(currentClusters.size());
 			currentClusterPointsByMarker = new HashMap<Marker, ClusterPoint>(currentClusters.size());
-			MarkerOptionsChooser mic = options.getMarkerOptionsChooser();
+			MarkerOptionsChooser moc = options.getMarkerOptionsChooser();
 			for (ClusterPoint clusterPoint : currentClusters) {
 				MarkerOptions markerOptions = new MarkerOptions();
 				markerOptions.position(clusterPoint.getMapPosition());
-				if (mic != null) {
-					mic.choose(markerOptions, clusterPoint);
+				if (moc != null) {
+					moc.choose(markerOptions, clusterPoint);
 				}
 				Marker marker = map.addMarker(markerOptions);
 				currentMarkers.add(marker);
@@ -158,18 +181,27 @@ public class Clusterkraf {
 		}
 	}
 
+	/**
+	 * Animate the camera so all of the InputPoint objects represented by the
+	 * passed ClusterPoint are in view
+	 * 
+	 * @param clusterPoint
+	 */
 	public void zoomToBounds(ClusterPoint clusterPoint) {
 		GoogleMap map = mapRef.get();
 		if (map != null && clusterPoint != null) {
 			innerCallbackListener.clusteringOnCameraChangeListener.setDirty(System.currentTimeMillis());
 			CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(clusterPoint.getBoundsOfInputPoints(), options.getZoomToBoundsPadding());
 			map.animateCamera(cameraUpdate, options.getZoomToBoundsAnimationDuration(), null);
-			/*
-			 * TODO : ClusteringCancelableCallback
-			 */
 		}
 	}
 
+	/**
+	 * Show the InfoWindow for the passed Marker and ClusterPoint
+	 * 
+	 * @param marker
+	 * @param clusterPoint
+	 */
 	public void showInfoWindow(Marker marker, ClusterPoint clusterPoint) {
 		GoogleMap map = mapRef.get();
 		if (map != null && marker != null && clusterPoint != null) {
@@ -222,53 +254,53 @@ public class Clusterkraf {
 			}
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
+		/**
 		 * @see com.twotoasters.clusterkraf.ClusterTransitionsAnimation.Host#
-		 * onClusterTransitionStarting()
+		 *      onClusterTransitionStarting()
 		 */
 		@Override
 		public void onClusterTransitionStarting() {
 			clusteringOnCameraChangeListener.setDirty(System.currentTimeMillis());
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
+		/**
 		 * @see com.twotoasters.clusterkraf.ClusterTransitionsAnimation.Host#
-		 * onClusterTransitionStarted()
+		 *      onClusterTransitionStarted()
 		 */
 		@Override
 		public void onClusterTransitionStarted() {
 			Clusterkraf clusterkraf = clusterkrafRef.get();
 			if (clusterkraf != null) {
+				/**
+				 * now that the first frame of the transition has been drawn, we
+				 * can remove our previous markers without suffering any
+				 * blinking markers
+				 */
 				clusterkraf.removePreviousMarkers();
 			}
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
+		/**
 		 * @see com.twotoasters.clusterkraf.ClusterTransitionsAnimation.Host#
-		 * onClusterTransitionFinished()
+		 *      onClusterTransitionFinished()
 		 */
 		@Override
 		public void onClusterTransitionFinished() {
 			Clusterkraf clusterkraf = clusterkrafRef.get();
 			if (clusterkraf != null) {
 				clusterkraf.drawMarkers();
+				/**
+				 * now that we have drawn our new set of markers, we can let the
+				 * transitionsAnimation know so it can clear its markers
+				 */
 				clusterkraf.transitionsAnimation.onHostPlottedDestinationClusterPoints();
 			}
 			clusteringOnCameraChangeListener.setDirty(0);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * com.google.android.gms.maps.GoogleMap.OnMarkerClickListener#onMarkerClick
-		 * (com.google.android.gms.maps.model.Marker)
+		/**
+		 * @see com.google.android.gms.maps.GoogleMap.OnMarkerClickListener#onMarkerClick
+		 *      (com.google.android.gms.maps.model.Marker)
 		 */
 		@Override
 		public boolean onMarkerClick(Marker marker) {
@@ -320,11 +352,9 @@ public class Clusterkraf {
 			return handled || exempt;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
+		/**
 		 * @see com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener#
-		 * onInfoWindowClick(com.google.android.gms.maps.model.Marker)
+		 *      onInfoWindowClick(com.google.android.gms.maps.model.Marker)
 		 */
 		@Override
 		public void onInfoWindowClick(Marker marker) {

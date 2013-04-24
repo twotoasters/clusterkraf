@@ -1,6 +1,3 @@
-/**
- * @author Carlton Whitehead
- */
 package com.twotoasters.clusterkraf;
 
 import java.lang.ref.WeakReference;
@@ -13,9 +10,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.VisibleRegion;
 
-/**
- *
- */
 class ClustersBuilder {
 
 	private final Options options;

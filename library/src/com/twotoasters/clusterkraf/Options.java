@@ -1,48 +1,108 @@
-/**
- * @author Carlton Whitehead
- */
 package com.twotoasters.clusterkraf;
 
 import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 
 /**
- * specify options for the clusterkraf instance
+ * Specify options for the Clusterkraf instance here
  */
 public class Options {
 
 	private static final int DEFAULT_TRANSITION_DURATION = 300;
+	/**
+	 * The length of the animated cluster transition in milliseconds
+	 */
 	private int transitionDuration = DEFAULT_TRANSITION_DURATION;
 
-	private Interpolator transitionInterpolator;
+	/**
+	 * The Interpolator used for animating the cluster transition.
+	 */
+	private Interpolator transitionInterpolator = new LinearInterpolator();
 
 	private static final int DEFAULT_PIXEL_DISTANCE_TO_JOIN_CLUSTER = 150;
+	/**
+	 * The pixel distance under which an InputPoint will cluster into a
+	 * neighbor.
+	 */
 	private int pixelDistanceToJoinCluster = DEFAULT_PIXEL_DISTANCE_TO_JOIN_CLUSTER;
 
 	private static final double DEFAULT_EXPAND_BOUNDS_FACTOR = 0;
+	/**
+	 * Defines how much the visible region bounds should be expanded when
+	 * considering whether an InputPoint is to be considered for clustering.
+	 * Lower values will result in higher drawing performance when many
+	 * InputPoint objects are off screen, but clusters will be more likely to
+	 * pop into view after the camera has finished moving when panning or
+	 * zooming out. Higher values will result in cluster sliding onto the map
+	 * smoothly when panning and zooming out, less prone to popping into view,
+	 * but at the expense of lower performance because many markers will need to
+	 * be drawn off screen.
+	 */
 	private double expandBoundsFactor = DEFAULT_EXPAND_BOUNDS_FACTOR;
 
+	/**
+	 * The MarkerOptionsChooser to use for customizing MarkerOptions objects.
+	 */
 	private MarkerOptionsChooser markerOptionsChooser;
 
+	/**
+	 * The OnMarkerClickDownstreamListener to receive callbacks when a marker is
+	 * clicked
+	 */
 	private OnMarkerClickDownstreamListener onMarkerClickDownstreamListener;
 
+	/**
+	 * The OnInfoWindowClickDownstreamListener to receive callbacks when an info
+	 * window is clicked
+	 */
 	private OnInfoWindowClickDownstreamListener onInfoWindowClickDownstreamListener;
 
+	/**
+	 * When zooming to the bounds of a marker's backing ClusterPoint, zoom until
+	 * all of the points are at least this far from the edge of the GoogleMap's
+	 * bounds
+	 */
 	private int zoomToBoundsPadding = 75;
 
 	private final int DEFAULT_ZOOM_TO_BOUNDS_ANIMATION_DURATION = 300;
+	/**
+	 * The length of the zoom to bounds animation in milliseconds
+	 */
 	private int zoomToBoundsAnimationDuration = DEFAULT_ZOOM_TO_BOUNDS_ANIMATION_DURATION;
 
 	private final int DEFAULT_SHOW_INFO_WINDOW_ANIMATION_DURATION = 300;
+	/**
+	 * The length of the show info window animation in milliseconds
+	 */
 	private int showInfoWindowAnimationDuration = DEFAULT_SHOW_INFO_WINDOW_ANIMATION_DURATION;
 
+	/**
+	 * The behavior when a cluster's marker is clicked
+	 */
 	private ClusterClickBehavior clusterClickBehavior = ClusterClickBehavior.ZOOM_TO_BOUNDS;
 
+	/**
+	 * The behavior when a cluster's info window is clicked
+	 */
 	private ClusterInfoWindowClickBehavior clusterInfoWindowClickBehavior = ClusterInfoWindowClickBehavior.HIDE_INFO_WINDOW;
 
+	/**
+	 * The behavior when a single point's marker is clicked
+	 */
 	private SinglePointClickBehavior singlePointClickBehavior = SinglePointClickBehavior.SHOW_INFO_WINDOW;
 
+	/**
+	 * The behavior when a single point's info window is clicked
+	 */
 	private SinglePointInfoWindowClickBehavior singlePointInfoWindowClickBehavior = SinglePointInfoWindowClickBehavior.HIDE_INFO_WINDOW;
 
+	/**
+	 * How long the ClusteringOnCameraChangeListener should remain dirty. This
+	 * should be set to slightly less than the duration of transition animation,
+	 * during which time you would not want the user to trigger a cluster update
+	 * process, but not so low that panning the map results in continuously
+	 * triggering cluster update processes.
+	 */
 	private long clusteringOnCameraChangeListenerDirtyLifetimeMillis = 200l;
 
 	/**
@@ -84,7 +144,10 @@ public class Options {
 
 	/**
 	 * @param pixelDistanceToJoinCluster
-	 *            the pixelDistanceToJoinCluster to set
+	 *            the pixelDistanceToJoinCluster to set. This value should be
+	 *            scaled appropriately if you are planning to support multiple
+	 *            screen densities. Suggested value: the greater of the width or
+	 *            height of your largest marker asset plus 25 percent.
 	 */
 	public void setPixelDistanceToJoinCluster(int pixelDistanceToJoinCluster) {
 		this.pixelDistanceToJoinCluster = pixelDistanceToJoinCluster;
@@ -261,6 +324,9 @@ public class Options {
 		return clusteringOnCameraChangeListenerDirtyLifetimeMillis;
 	}
 
+	/**
+	 * @param clusteringOnCameraChangeListenerDirtyLifetimeMillis
+	 */
 	public void setClusteringOnCameraChangeListenerDirtyLifetimeMillis(long clusteringOnCameraChangeListenerDirtyLifetimeMillis) {
 		this.clusteringOnCameraChangeListenerDirtyLifetimeMillis = clusteringOnCameraChangeListenerDirtyLifetimeMillis;
 	}

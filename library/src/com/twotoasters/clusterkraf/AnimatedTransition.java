@@ -1,12 +1,9 @@
-/**
- * @author Carlton Whitehead
- */
 package com.twotoasters.clusterkraf;
 
 import com.google.android.gms.maps.Projection;
 
 /**
- *
+ * Models the animated transition of a cluster
  */
 class AnimatedTransition {
 
@@ -50,6 +47,10 @@ class AnimatedTransition {
 		originClusterRelevantInputPoints.add(previousInputPoint);
 	}
 
+	/**
+	 * @return whether (true) or not (false) the origin and destination
+	 *         longitudes are on opposite sides of the 180 meridian
+	 */
 	boolean spans180Meridian() {
 		return spans180Meridian;
 	}

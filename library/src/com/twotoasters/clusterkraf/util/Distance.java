@@ -1,6 +1,3 @@
-/**
- * @author Carlton Whitehead
- */
 package com.twotoasters.clusterkraf.util;
 
 import android.graphics.Point;
@@ -11,6 +8,7 @@ import android.graphics.Point;
 public class Distance {
 	/**
 	 * calculate the distance between two points; pythagorean theorem
+	 * 
 	 * @param x1
 	 * @param y1
 	 * @param x2
@@ -22,9 +20,11 @@ public class Distance {
 		double b = Math.abs(y1 - y2);
 		return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
 	}
-	
+
 	/**
-	 * convenience for calculating the distance between two android.graphics.Point objects
+	 * convenience for calculating the distance between two
+	 * android.graphics.Point objects
+	 * 
 	 * @param a
 	 * @param b
 	 * @return the distance between two Points

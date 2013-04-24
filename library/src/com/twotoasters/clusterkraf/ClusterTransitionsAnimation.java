@@ -1,6 +1,3 @@
-/**
- * @author Carlton Whitehead
- */
 package com.twotoasters.clusterkraf;
 
 import java.lang.ref.WeakReference;
@@ -17,9 +14,6 @@ import com.nineoldandroids.animation.ObjectAnimator;
 import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.animation.ValueAnimator.AnimatorUpdateListener;
 
-/**
- *
- */
 class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateListener {
 
 	private final WeakReference<GoogleMap> mapRef;
@@ -108,6 +102,13 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 				if (transition.spans180Meridian() == false) {
 					currentLon = start.longitude + (value * (end.longitude - start.longitude));
 				} else {
+					/**
+					 * transitions that span the 180 meridian cannot be animated
+					 * directly from their start longitude to end longitude
+					 * (they would travel the long way around the globe), so we
+					 * shift their longitude so their trajectory crosses the 180
+					 * meridian (instead of the prime meridian).
+					 */
 					double shiftedStartLon = start.longitude < 0 ? start.longitude + 360 : start.longitude;
 					double shiftedEndLon = end.longitude < 0 ? end.longitude + 360 : end.longitude;
 					double shiftedCurrentLon = shiftedStartLon + (value * (shiftedEndLon - shiftedStartLon));
@@ -119,11 +120,9 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see com.nineoldandroids.animation.ValueAnimator.AnimatorUpdateListener#
-	 * onAnimationUpdate(com.nineoldandroids.animation.ValueAnimator)
+	 *      onAnimationUpdate(com.nineoldandroids.animation.ValueAnimator)
 	 */
 	@Override
 	public void onAnimationUpdate(ValueAnimator animator) {
@@ -135,25 +134,18 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.nineoldandroids.animation.Animator.AnimatorListener#onAnimationCancel
-	 * (com.nineoldandroids.animation.Animator)
+	/**
+	 * @see com.nineoldandroids.animation.Animator.AnimatorListener#onAnimationCancel
+	 *      (com.nineoldandroids.animation.Animator)
 	 */
 	@Override
 	public void onAnimationCancel(Animator animator) {
-		// TODO Auto-generated method stub
-
+		// no-op
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.nineoldandroids.animation.Animator.AnimatorListener#onAnimationEnd
-	 * (com.nineoldandroids.animation.Animator)
+	/**
+	 * @see com.nineoldandroids.animation.Animator.AnimatorListener#onAnimationEnd
+	 *      (com.nineoldandroids.animation.Animator)
 	 */
 	@Override
 	public void onAnimationEnd(Animator animator) {
@@ -163,25 +155,21 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.nineoldandroids.animation.Animator.AnimatorListener#onAnimationRepeat
-	 * (com.nineoldandroids.animation.Animator)
+	/**
+	 * @see com.nineoldandroids.animation.Animator.AnimatorListener#onAnimationRepeat
+	 *      (com.nineoldandroids.animation.Animator)
 	 */
 	@Override
 	public void onAnimationRepeat(Animator animator) {
-		// TODO Auto-generated method stub
-
+		// no-op
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Add temporary stationary and animated transition markers, holds onto
+	 * references, and calls back to the Host when finished
 	 * 
-	 * @see
-	 * com.nineoldandroids.animation.Animator.AnimatorListener#onAnimationStart
-	 * (com.nineoldandroids.animation.Animator)
+	 * @see com.nineoldandroids.animation.Animator.AnimatorListener#onAnimationStart
+	 *      (com.nineoldandroids.animation.Animator)
 	 */
 	@Override
 	public void onAnimationStart(Animator animator) {
@@ -222,6 +210,10 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 		host.onClusterTransitionStarted();
 	}
 
+	/**
+	 * The Host must call this after it plots its cluster points so that the
+	 * stationary and animated transition markers can be removed.
+	 */
 	void onHostPlottedDestinationClusterPoints() {
 		if (animatedMarkers != null && animatedMarkers.length > 0) {
 			for (Marker marker : animatedMarkers) {
@@ -254,10 +246,19 @@ class ClusterTransitionsAnimation implements AnimatorListener, AnimatorUpdateLis
 	}
 
 	interface Host {
+		/**
+		 * Called immediately prior to a cluster transition's animation starting
+		 */
 		void onClusterTransitionStarting();
 
+		/**
+		 * Called when the cluster transition's animation has started
+		 */
 		void onClusterTransitionStarted();
 
+		/**
+		 * Called when the cluster transition's animation has finished
+		 */
 		void onClusterTransitionFinished();
 	}
 }

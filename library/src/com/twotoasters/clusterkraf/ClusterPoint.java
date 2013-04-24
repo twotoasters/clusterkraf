@@ -1,6 +1,3 @@
-/**
- * @author Carlton Whitehead
- */
 package com.twotoasters.clusterkraf;
 
 import java.util.ArrayList;
@@ -11,7 +8,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 /**
- *
+ * Represents one or more InputPoint objects that have been clustered together
+ * due to pixel proximity
  */
 public class ClusterPoint extends BasePoint {
 
@@ -45,23 +43,29 @@ public class ClusterPoint extends BasePoint {
 		return pointsInClusterList;
 	}
 
+	/**
+	 * @param index
+	 * @return the InputPoint at the given index
+	 */
 	public InputPoint getPointAtOffset(int index) {
 		return pointsInClusterList.get(index);
 	}
 
+	/**
+	 * @return the number of InputPoint objects in this ClusterPoint
+	 */
 	public int size() {
 		return pointsInClusterList.size();
 	}
 
+	/**
+	 * @param point
+	 * @return true if the InputPoint is in this ClusterPoint, otherwise false
+	 */
 	public boolean containsInputPoint(InputPoint point) {
 		return pointsInClusterSet.contains(point);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.twotoasters.clusterkraf.BasePoint#clearScreenPosition()
-	 */
 	@Override
 	void clearScreenPosition() {
 		super.clearScreenPosition();
@@ -71,7 +75,7 @@ public class ClusterPoint extends BasePoint {
 	}
 
 	/**
-	 * @return whether this object is part of a transition
+	 * @return true if this object is part of a transition, otherwise false
 	 */
 	public boolean isTransition() {
 		return transition;
