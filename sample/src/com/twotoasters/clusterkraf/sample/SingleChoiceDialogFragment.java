@@ -1,6 +1,3 @@
-/**
- * @author Carlton Whitehead
- */
 package com.twotoasters.clusterkraf.sample;
 
 import java.lang.ref.WeakReference;
