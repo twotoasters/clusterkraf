@@ -50,13 +50,41 @@ public class AdvancedModeFragment extends Fragment implements OnItemClickListene
 
 	private static final String TAG_SINGLE_CHOICE_DIALOG_FRAGMENT = SingleChoiceDialogFragment.class.getSimpleName();
 
+	/**
+	 * When your data set IS NOT distributed evenly throughout the world, the
+	 * user is going to spend more time with all of the points on screen or
+	 * within the overdrawn bounds, so you would want to reduce the number of
+	 * those points in order to maintain performance.
+	 */
 	private final int[] pointsCountNearTwoToasters = new int[] { 1, 10, 25, 50, 100, 250, 500, 1000, 2500 };
+	/**
+	 * When your data set IS distributed evenly throughout the world,
+	 * Clusterkraf will optimize out points that are not in view
+	 * (expandBoundsFactor == 0), or are far off screen (expandBoundsFactor > 0)
+	 */
 	private final int[] pointsCountWorldwide = new int[] { 1, 100, 250, 500, 1000, 2500, 5000, 10000, 25000 };
+	/**
+	 * Some interpolators look better with slightly longer durations.
+	 */
 	private final int[] animationDurations = new int[] { 300, 500, 700, 1000, 2000, 5000, 10000 };
+	/**
+	 * Influence the progress of the animation by choosing a different
+	 * interpolator than the standard LinearInterpolator.
+	 */
 	private final Class<?>[] interpolators = new Class[] { AccelerateDecelerateInterpolator.class, AccelerateInterpolator.class, AnticipateInterpolator.class,
 			AnticipateOvershootInterpolator.class, BounceInterpolator.class, DecelerateInterpolator.class, LinearInterpolator.class,
 			OvershootInterpolator.class };
+	/**
+	 * Device Independent Pixels distance to join cluster
+	 */
 	private final int[] dipDistanceToJoinCluster = new int[] { 75, 100, 125, 150, 200, 250 };
+	/**
+	 * Controls how far off screen to draw markers. 0 offers drastically better
+	 * performance with very large data sets when the map is zoomed all the way
+	 * out, but markers will often pop into view when panning and zooming out. 1
+	 * offers smoother panning and zooming out (markers don't pop into view),
+	 * but with some performance expense.
+	 */
 	private final double[] expandBoundsFactors = new double[] { 0d, 0.25d, 0.33d, 0.5d, 0.67d, 0.75d, 1.0d };
 
 	private SampleActivity.Options advancedOptions = new SampleActivity.Options();

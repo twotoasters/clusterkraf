@@ -89,11 +89,15 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 	@Override
 	protected void onPause() {
 		super.onPause();
+		/**
+		 * When pausing, we clear all of the clusterkraf's markers in order to
+		 * conserve memory. When (if) we resume, we can rebuild from where we
+		 * left off.
+		 */
 		if (clusterkraf != null) {
 			clusterkraf.clear();
 			clusterkraf = null;
 			if (map != null) {
-				map.clear();
 				restoreCameraPosition = map.getCameraPosition();
 			}
 		}
@@ -143,9 +147,18 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 		if (map != null && options != null && inputPoints != null) {
 			try {
 				if (restoreCameraPosition != null) {
+					/**
+					 * if a restoreCameraPosition is available, move the camera
+					 * there
+					 */
 					map.moveCamera(CameraUpdateFactory.newCameraPosition(restoreCameraPosition));
 					restoreCameraPosition = null;
 				} else {
+					/**
+					 * otherwise, move the camera over the Two Toasters office
+					 * at an appropriate zoom based on the user's choice of
+					 * geographic distribution
+					 */
 					float zoom = options.geographicDistribution == GeographicDistribution.NearTwoToasters ? 11 : 4;
 					map.moveCamera(CameraUpdateFactory.newLatLngZoom(inputPoints.get(0).getMapPosition(), zoom));
 				}
@@ -164,8 +177,24 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 		}
 	}
 
+	/**
+	 * Applies the sample.SampleActivity.Options chosen in Normal or Advanced
+	 * mode menus to the clusterkraf.Options which will be used to construct our
+	 * Clusterkraf instance
+	 * 
+	 * @param options
+	 */
 	private void applyDemoOptionsToClusterkrafOptions(com.twotoasters.clusterkraf.Options options) {
 		options.setTransitionDuration(this.options.transitionDuration);
+
+		/**
+		 * this is probably not how you would set an interpolator in your own
+		 * app. You would probably have just one that you wanted to hard code in
+		 * your app (show me the mobile app user who actually wants to fiddle
+		 * with the interpolator used in their animations), so you would do
+		 * something more like `options.setInterpolator(new
+		 * DecelerateInterpolator());` rather than mess around with reflection.
+		 */
 		Interpolator interpolator = null;
 		try {
 			interpolator = (Interpolator)Class.forName(this.options.transitionInterpolator).newInstance();
@@ -177,7 +206,16 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 			e.printStackTrace();
 		}
 		options.setTransitionInterpolator(interpolator);
+
+		/**
+		 * Clusterkraf calculates whether InputPoint objects should join a
+		 * cluster based on their pixel proximity. If you want to offer your app
+		 * on devices with different screen densities, you should identify a
+		 * Device Independent Pixel measurement and convert it to pixels based
+		 * on the device's screen density at runtime.
+		 */
 		options.setPixelDistanceToJoinCluster(getPixelDistanceToJoinCluster());
+
 		options.setZoomToBoundsAnimationDuration(this.options.zoomToBoundsAnimationDuration);
 		options.setShowInfoWindowAnimationDuration(this.options.showInfoWindowAnimationDuration);
 		options.setExpandBoundsFactor(this.options.expandBoundsFactor);
@@ -185,6 +223,12 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 		options.setClusterClickBehavior(this.options.clusterClickBehavior);
 		options.setClusterInfoWindowClickBehavior(this.options.clusterInfoWindowClickBehavior);
 
+		/**
+		 * Device Independent Pixel measurement should be converted to pixels
+		 * here too. In this case, we cheat a little by using a Drawable's
+		 * height. It's only cheating because we don't offer a variant for that
+		 * Drawable for every density (xxhdpi, tvdpi, others?).
+		 */
 		options.setZoomToBoundsPadding(getResources().getDrawable(R.drawable.ic_map_pin_cluster).getIntrinsicHeight());
 
 		options.setMarkerOptionsChooser(new ToastedMarkerOptionsChooser(this, inputPoints.get(0)));
@@ -211,6 +255,7 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 	static class Options implements Serializable {
 
 		private static final long serialVersionUID = 7492713360265465944L;
+
 		// sample app-specific options
 		int pointCount = 100;
 		GeographicDistribution geographicDistribution = GeographicDistribution.NearTwoToasters;
