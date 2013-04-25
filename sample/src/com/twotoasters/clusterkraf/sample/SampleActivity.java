@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.view.MenuItem;
@@ -19,6 +20,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.twotoasters.clusterkraf.Clusterkraf;
+import com.twotoasters.clusterkraf.Clusterkraf.ProcessingListener;
 import com.twotoasters.clusterkraf.InputPoint;
 import com.twotoasters.clusterkraf.Options.ClusterClickBehavior;
 import com.twotoasters.clusterkraf.Options.ClusterInfoWindowClickBehavior;
@@ -26,11 +28,15 @@ import com.twotoasters.clusterkraf.Options.SinglePointClickBehavior;
 import com.twotoasters.clusterkraf.sample.RandomPointsProvider.GenerateCallback;
 import com.twotoasters.clusterkraf.sample.RandomPointsProvider.GeographicDistribution;
 
-public class SampleActivity extends FragmentActivity implements GenerateCallback {
+public class SampleActivity extends FragmentActivity implements GenerateCallback, ProcessingListener {
 
 	public static final String EXTRA_OPTIONS = "options";
 
 	private static final String KEY_CAMERA_POSITION = "camera position";
+
+	private static final long DELAY_CLUSTERING_SPINNER_MILLIS = 200l;
+
+	private final Handler handler = new Handler();
 
 	private Options options;
 
@@ -38,6 +44,7 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 	private CameraPosition restoreCameraPosition;
 	private Clusterkraf clusterkraf;
 	private ArrayList<InputPoint> inputPoints;
+	private DelayedIndeterminateProgressBarRunnable delayedIndeterminateProgressBarRunnable;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -157,7 +164,7 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 					 * geographic distribution
 					 */
 					float zoom = options.geographicDistribution == GeographicDistribution.NearTwoToasters ? 11 : 4;
-					map.moveCamera(CameraUpdateFactory.newLatLngZoom(inputPoints.get(0).getMapPosition(), zoom));
+					map.moveCamera(CameraUpdateFactory.newLatLngZoom(MarkerData.TwoToasters.getLatLng(), zoom));
 				}
 				initClusterkraf();
 			} catch (IllegalStateException ise) {
@@ -230,6 +237,7 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 
 		options.setMarkerOptionsChooser(new ToastedMarkerOptionsChooser(this, inputPoints.get(0)));
 		options.setOnMarkerClickDownstreamListener(new ToastedOnMarkerClickDownstreamListener(this));
+		options.setProcessingListener(this);
 	}
 
 	private int getPixelDistanceToJoinCluster() {
@@ -244,7 +252,6 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 
 	@Override
 	public void onRandomMarkersGenerated(ArrayList<InputPoint> inputPoints) {
-		setProgressBarIndeterminateVisibility(false);
 		this.inputPoints = inputPoints;
 		initMap();
 	}
@@ -267,6 +274,23 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 		SinglePointClickBehavior singlePointClickBehavior = SinglePointClickBehavior.SHOW_INFO_WINDOW;
 		ClusterClickBehavior clusterClickBehavior = ClusterClickBehavior.ZOOM_TO_BOUNDS;
 		ClusterInfoWindowClickBehavior clusterInfoWindowClickBehavior = ClusterInfoWindowClickBehavior.ZOOM_TO_BOUNDS;
+	}
+
+	@Override
+	public void onClusteringStarted() {
+		if (delayedIndeterminateProgressBarRunnable == null) {
+			delayedIndeterminateProgressBarRunnable = new DelayedIndeterminateProgressBarRunnable(this);
+			handler.postDelayed(delayedIndeterminateProgressBarRunnable, DELAY_CLUSTERING_SPINNER_MILLIS);
+		}
+	}
+
+	@Override
+	public void onClusteringFinished() {
+		if (delayedIndeterminateProgressBarRunnable != null) {
+			handler.removeCallbacks(delayedIndeterminateProgressBarRunnable);
+			delayedIndeterminateProgressBarRunnable = null;
+		}
+		setProgressBarIndeterminateVisibility(false);
 	}
 
 }

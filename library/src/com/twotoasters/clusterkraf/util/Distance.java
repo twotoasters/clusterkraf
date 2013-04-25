@@ -30,6 +30,9 @@ public class Distance {
 	 * @return the distance between two Points
 	 */
 	public static double from(Point a, Point b) {
-		return from(a.x, a.y, b.x, b.y);
+		if (a != null && b != null) {
+			return from(a.x, a.y, b.x, b.y);
+		}
+		return 0;
 	}
 }

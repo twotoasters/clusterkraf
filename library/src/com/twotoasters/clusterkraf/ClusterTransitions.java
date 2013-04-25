@@ -3,7 +3,6 @@ package com.twotoasters.clusterkraf;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 
 class ClusterTransitions {
@@ -24,8 +23,8 @@ class ClusterTransitions {
 		private final ArrayList<AnimatedTransition> animatedTransitions = new ArrayList<AnimatedTransition>();
 		private final ArrayList<ClusterPoint> stationaryTransitions = new ArrayList<ClusterPoint>();
 
-		Builder(GoogleMap map, ArrayList<ClusterPoint> previousClusterPoints) {
-			this.projectionRef = new WeakReference<Projection>(map.getProjection());
+		Builder(Projection projection, ArrayList<ClusterPoint> previousClusterPoints) {
+			this.projectionRef = new WeakReference<Projection>(projection);
 			this.previousClusterPoints = previousClusterPoints;
 		}
 
@@ -33,16 +32,18 @@ class ClusterTransitions {
 			Projection projection = projectionRef != null ? projectionRef.get() : null;
 			if (currentClusterPoint != null && projection != null) {
 				boolean animated = false;
-				for (ClusterPoint previousClusterPoint : previousClusterPoints) {
-					for (InputPoint previousInputPoint : previousClusterPoint.getPointsInCluster()) {
-						if (currentClusterPoint.containsInputPoint(previousInputPoint)) {
-							AnimatedTransition transition = getTransition(previousInputPoint);
-							if (transition != null) {
-								transition.addOriginClusterRelevantInputPoint(previousInputPoint);
-							} else {
-								transition = new AnimatedTransition(projection, previousClusterPoint, previousInputPoint, currentClusterPoint);
-								animatedTransitions.add(transition);
-								animated = true;
+				if (previousClusterPoints != null) {
+					for (ClusterPoint previousClusterPoint : previousClusterPoints) {
+						for (InputPoint previousInputPoint : previousClusterPoint.getPointsInCluster()) {
+							if (currentClusterPoint.containsInputPoint(previousInputPoint)) {
+								AnimatedTransition transition = getTransition(previousInputPoint);
+								if (transition != null) {
+									transition.addOriginClusterRelevantInputPoint(previousInputPoint);
+								} else {
+									transition = new AnimatedTransition(projection, previousClusterPoint, previousInputPoint, currentClusterPoint);
+									animatedTransitions.add(transition);
+									animated = true;
+								}
 							}
 						}
 					}

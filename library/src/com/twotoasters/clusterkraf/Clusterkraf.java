@@ -4,6 +4,9 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.annotation.SuppressLint;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -32,6 +35,8 @@ public class Clusterkraf {
 	private HashMap<Marker, ClusterPoint> currentClusterPointsByMarker = new HashMap<Marker, ClusterPoint>();
 	private ArrayList<ClusterPoint> previousClusters;
 	private ArrayList<Marker> previousMarkers;
+	private BaseClusteringTaskHost clusteringTaskHost;
+	private ClusterTransitionsBuildingTaskHost clusterTransitionsBuildingTaskHost;
 
 	/**
 	 * Construct a Clusterkraf instance to manage your map with customized
@@ -50,6 +55,12 @@ public class Clusterkraf {
 
 		if (points != null) {
 			this.points.addAll(points);
+		}
+
+		if (map != null) {
+			map.setOnCameraChangeListener(innerCallbackListener.clusteringOnCameraChangeListener);
+			map.setOnMarkerClickListener(innerCallbackListener);
+			map.setOnInfoWindowClickListener(innerCallbackListener);
 		}
 
 		showAllClusters();
@@ -104,8 +115,10 @@ public class Clusterkraf {
 		 * 
 		 * @see http://code.google.com/p/gmaps-api-issues/issues/detail?id=4703
 		 */
-		for (Marker marker : currentMarkers) {
-			marker.remove();
+		if (currentMarkers != null) {
+			for (Marker marker : currentMarkers) {
+				marker.remove();
+			}
 		}
 		currentMarkers = null;
 		currentClusterPointsByMarker = null;
@@ -115,12 +128,7 @@ public class Clusterkraf {
 	// TODO: support removing individual InputPoint objects
 
 	private void buildClusters() {
-		GoogleMap map = mapRef.get();
-		if (map != null) {
-			ClustersBuilder builder = new ClustersBuilder(map, options, previousClusters);
-			builder.addAll(points);
-			currentClusters = builder.build();
-		}
+
 	}
 
 	private void drawMarkers() {
@@ -154,30 +162,41 @@ public class Clusterkraf {
 	}
 
 	private void updateClustersAndTransition() {
-		previousClusters = currentClusters;
-		previousMarkers = currentMarkers;
-
-		buildClusters();
-
 		GoogleMap map = mapRef.get();
-		if (map != null && currentClusters != null && previousClusters != null) {
-			ClusterTransitions.Builder ctb = new ClusterTransitions.Builder(map, previousClusters);
-			for (ClusterPoint currentClusterPoint : currentClusters) {
-				ctb.add(currentClusterPoint);
+		if (clusteringTaskHost != null) {
+			if (map != null && currentClusters != null) {
+				clusteringTaskHost = null;
+				transitionClusters(null);
 			}
-			transitionsAnimation.animate(ctb.build());
+		} else {
+			if (map != null) {
+				previousClusters = currentClusters;
+				previousMarkers = currentMarkers;
+
+				clusteringTaskHost = new UpdateClustersAndTransitionClusteringTaskHost();
+				clusteringTaskHost.executeTask();
+			}
+		}
+	}
+
+	private void transitionClusters(ClusterTransitions clusterTransitions) {
+		if (clusterTransitionsBuildingTaskHost != null) {
+			// TODO: null guard
+			transitionsAnimation.animate(clusterTransitions);
+			clusterTransitionsBuildingTaskHost = null;
+		} else {
+			clusterTransitionsBuildingTaskHost = new ClusterTransitionsBuildingTaskHost();
+			clusterTransitionsBuildingTaskHost.executeTask();
 		}
 	}
 
 	private void showAllClusters() {
-		buildClusters();
-		drawMarkers();
-
-		GoogleMap map = mapRef.get();
-		if (map != null) {
-			map.setOnCameraChangeListener(innerCallbackListener.clusteringOnCameraChangeListener);
-			map.setOnMarkerClickListener(innerCallbackListener);
-			map.setOnInfoWindowClickListener(innerCallbackListener);
+		if (clusteringTaskHost != null) {
+			drawMarkers();
+			clusteringTaskHost = null;
+		} else {
+			clusteringTaskHost = new ShowAllClustersClusteringTaskHost();
+			clusteringTaskHost.executeTask();
 		}
 	}
 
@@ -249,6 +268,14 @@ public class Clusterkraf {
 		public void onClusteringCameraChange() {
 			Clusterkraf clusterkraf = clusterkrafRef.get();
 			if (clusterkraf != null) {
+				if (clusterkraf.clusteringTaskHost != null) {
+					clusterkraf.clusteringTaskHost.cancel();
+					clusterkraf.clusteringTaskHost = null;
+				}
+				if (clusterkraf.clusterTransitionsBuildingTaskHost != null) {
+					clusterkraf.clusterTransitionsBuildingTaskHost.cancel();
+					clusterkraf.clusterTransitionsBuildingTaskHost = null;
+				}
 				clusterkraf.transitionsAnimation.cancel();
 				clusterkraf.updateClustersAndTransition();
 			}
@@ -394,6 +421,114 @@ public class Clusterkraf {
 			}
 
 		}
+	}
+
+	abstract private class BaseClusteringTaskHost implements ClusteringTask.Host {
+
+		private ClusteringTask task;
+
+		BaseClusteringTaskHost() {
+			this.task = new ClusteringTask(this);
+		}
+
+		@Override
+		public void onClusteringTaskPostExecute(ClusteringTask.Result result) {
+			currentClusters = result.currentClusters;
+			onCurrentClustersSet();
+			task = null;
+		}
+
+		public void cancel() {
+			task.cancel(true);
+			task = null;
+		}
+
+		@SuppressLint("NewApi")
+		public void executeTask() {
+			// TODO: null guards
+			ProcessingListener processingListener = options.getProcessingListener();
+			if (processingListener != null) {
+				processingListener.onClusteringStarted();
+			}
+
+			ClusteringTask.Argument arg = new ClusteringTask.Argument();
+			arg.projection = mapRef.get().getProjection();
+			arg.options = options;
+			arg.points = points;
+			arg.previousClusters = previousClusters;
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+				task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, arg);
+			} else {
+				task.execute(arg);
+			}
+
+		}
+
+		abstract protected void onCurrentClustersSet();
+
+	}
+
+	private class ShowAllClustersClusteringTaskHost extends BaseClusteringTaskHost {
+
+		@Override
+		protected void onCurrentClustersSet() {
+			showAllClusters();
+		}
+	}
+
+	private class UpdateClustersAndTransitionClusteringTaskHost extends BaseClusteringTaskHost {
+
+		@Override
+		protected void onCurrentClustersSet() {
+			updateClustersAndTransition();
+		}
+
+	}
+
+	private class ClusterTransitionsBuildingTaskHost implements ClusterTransitionsBuildingTask.Host {
+
+		private ClusterTransitionsBuildingTask task;
+
+		ClusterTransitionsBuildingTaskHost() {
+			this.task = new ClusterTransitionsBuildingTask(this);
+		}
+
+		@Override
+		public void onClusterTransitionsBuildingTaskPostExecute(ClusterTransitionsBuildingTask.Result result) {
+			// TODO: null guard
+			ProcessingListener processingListener = options.getProcessingListener();
+			if (processingListener != null) {
+				processingListener.onClusteringFinished();
+			}
+			transitionClusters(result.clusterTransitions);
+			task = null;
+		}
+
+		public void cancel() {
+			task.cancel(true);
+			task = null;
+		}
+
+		@SuppressLint("NewApi")
+		public void executeTask() {
+			// TODO: null guards
+			ClusterTransitionsBuildingTask.Argument arg = new ClusterTransitionsBuildingTask.Argument();
+			arg.currentClusters = currentClusters;
+			arg.previousClusters = previousClusters;
+			arg.projection = mapRef.get().getProjection();
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+				task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, arg);
+			} else {
+				task.execute(arg);
+			}
+		}
+
+	}
+
+	public interface ProcessingListener {
+		void onClusteringStarted();
+
+		void onClusteringFinished();
 	}
 
 }

@@ -4,7 +4,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -20,10 +19,9 @@ class ClustersBuilder {
 	private final WeakReference<Projection> projectionRef;
 	private final WeakReference<VisibleRegion> visibleRegionRef;
 
-	ClustersBuilder(GoogleMap map, Options options, ArrayList<ClusterPoint> initialClusteredPoints) {
+	ClustersBuilder(Projection projection, Options options, ArrayList<ClusterPoint> initialClusteredPoints) {
 		this.options = options;
 
-		Projection projection = map.getProjection();
 		this.projectionRef = new WeakReference<Projection>(projection);
 		this.visibleRegionRef = new WeakReference<VisibleRegion>(projection.getVisibleRegion());
 
