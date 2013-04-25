@@ -27,13 +27,14 @@ public class ClusterTransitionsBuildingTask extends AsyncTask<Argument, Void, Re
 	protected Result doInBackground(Argument... args) {
 		Result result = new Result();
 		if (args != null && args.length == 1) {
-			// TODO: null guards
 			Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT + Process.THREAD_PRIORITY_LESS_FAVORABLE);
 
 			Argument arg = args[0];
 			ClusterTransitions.Builder ctb = new ClusterTransitions.Builder(arg.projection, arg.previousClusters);
-			for (ClusterPoint currentClusterPoint : arg.currentClusters) {
-				ctb.add(currentClusterPoint);
+			if (arg.currentClusters != null) {
+				for (ClusterPoint currentClusterPoint : arg.currentClusters) {
+					ctb.add(currentClusterPoint);
+				}
 			}
 			result.clusterTransitions = ctb.build();
 

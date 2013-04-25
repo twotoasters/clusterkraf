@@ -23,7 +23,7 @@ class ClusteringOnCameraChangeListener implements OnCameraChangeListener {
 	@Override
 	public void onCameraChange(CameraPosition newPosition) {
 		long now = System.currentTimeMillis();
-		long notDirtyAfter = now + options.getClusteringOnCameraChangeListenerDirtyLifetimeMillis();
+		long notDirtyAfter = now - options.getClusteringOnCameraChangeListenerDirtyLifetimeMillis();
 		if (dirty < notDirtyAfter) {
 			Host host = hostRef.get();
 			if (host != null) {

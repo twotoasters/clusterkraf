@@ -127,10 +127,6 @@ public class Clusterkraf {
 
 	// TODO: support removing individual InputPoint objects
 
-	private void buildClusters() {
-
-	}
-
 	private void drawMarkers() {
 		GoogleMap map = mapRef.get();
 		if (map != null && currentClusters != null) {
@@ -180,11 +176,10 @@ public class Clusterkraf {
 	}
 
 	private void transitionClusters(ClusterTransitions clusterTransitions) {
-		if (clusterTransitionsBuildingTaskHost != null) {
-			// TODO: null guard
+		if (clusterTransitionsBuildingTaskHost != null && clusterTransitions != null) {
 			transitionsAnimation.animate(clusterTransitions);
 			clusterTransitionsBuildingTaskHost = null;
-		} else {
+		} else if (clusterTransitionsBuildingTaskHost == null) {
 			clusterTransitionsBuildingTaskHost = new ClusterTransitionsBuildingTaskHost();
 			clusterTransitionsBuildingTaskHost.executeTask();
 		}
@@ -445,21 +440,23 @@ public class Clusterkraf {
 
 		@SuppressLint("NewApi")
 		public void executeTask() {
-			// TODO: null guards
-			ProcessingListener processingListener = options.getProcessingListener();
-			if (processingListener != null) {
-				processingListener.onClusteringStarted();
-			}
+			GoogleMap map = mapRef.get();
+			if (map != null) {
+				ProcessingListener processingListener = options.getProcessingListener();
+				if (processingListener != null) {
+					processingListener.onClusteringStarted();
+				}
 
-			ClusteringTask.Argument arg = new ClusteringTask.Argument();
-			arg.projection = mapRef.get().getProjection();
-			arg.options = options;
-			arg.points = points;
-			arg.previousClusters = previousClusters;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, arg);
-			} else {
-				task.execute(arg);
+				ClusteringTask.Argument arg = new ClusteringTask.Argument();
+				arg.projection = map.getProjection();
+				arg.options = options;
+				arg.points = points;
+				arg.previousClusters = previousClusters;
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+					task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, arg);
+				} else {
+					task.execute(arg);
+				}
 			}
 
 		}
@@ -495,12 +492,13 @@ public class Clusterkraf {
 
 		@Override
 		public void onClusterTransitionsBuildingTaskPostExecute(ClusterTransitionsBuildingTask.Result result) {
-			// TODO: null guard
 			ProcessingListener processingListener = options.getProcessingListener();
 			if (processingListener != null) {
 				processingListener.onClusteringFinished();
 			}
-			transitionClusters(result.clusterTransitions);
+			if (result != null) {
+				transitionClusters(result.clusterTransitions);
+			}
 			task = null;
 		}
 
@@ -511,15 +509,17 @@ public class Clusterkraf {
 
 		@SuppressLint("NewApi")
 		public void executeTask() {
-			// TODO: null guards
-			ClusterTransitionsBuildingTask.Argument arg = new ClusterTransitionsBuildingTask.Argument();
-			arg.currentClusters = currentClusters;
-			arg.previousClusters = previousClusters;
-			arg.projection = mapRef.get().getProjection();
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, arg);
-			} else {
-				task.execute(arg);
+			GoogleMap map = mapRef.get();
+			if (map != null) {
+				ClusterTransitionsBuildingTask.Argument arg = new ClusterTransitionsBuildingTask.Argument();
+				arg.currentClusters = currentClusters;
+				arg.previousClusters = previousClusters;
+				arg.projection = map.getProjection();
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+					task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, arg);
+				} else {
+					task.execute(arg);
+				}
 			}
 		}
 
