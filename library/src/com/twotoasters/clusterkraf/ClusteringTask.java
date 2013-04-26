@@ -33,6 +33,7 @@ public class ClusteringTask extends AsyncTask<Argument, Void, Result> {
 			ClustersBuilder builder = new ClustersBuilder(arg.projection, arg.options, arg.previousClusters);
 			builder.addAll(arg.points);
 			result.currentClusters = builder.build();
+			result.projection = arg.projection;
 
 			Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 		}
@@ -58,6 +59,7 @@ public class ClusteringTask extends AsyncTask<Argument, Void, Result> {
 	}
 
 	static class Result {
+		Projection projection;
 		ArrayList<ClusterPoint> currentClusters;
 	}
 

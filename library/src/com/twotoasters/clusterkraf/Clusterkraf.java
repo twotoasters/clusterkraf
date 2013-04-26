@@ -15,6 +15,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.CancelableCallback;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -158,31 +159,29 @@ public class Clusterkraf {
 	}
 
 	private void updateClustersAndTransition() {
-		GoogleMap map = mapRef.get();
-		if (clusteringTaskHost != null) {
-			if (map != null && currentClusters != null) {
-				clusteringTaskHost = null;
-				transitionClusters(null);
-			}
-		} else {
-			if (map != null) {
-				previousClusters = currentClusters;
-				previousMarkers = currentMarkers;
+		previousClusters = currentClusters;
+		previousMarkers = currentMarkers;
 
-				clusteringTaskHost = new UpdateClustersAndTransitionClusteringTaskHost();
-				clusteringTaskHost.executeTask();
-			}
-		}
+		startClusteringTask();
+	}
+
+	private void startClusteringTask() {
+		clusteringTaskHost = new UpdateClustersAndTransitionClusteringTaskHost();
+		clusteringTaskHost.executeTask();
 	}
 
 	private void transitionClusters(ClusterTransitions clusterTransitions) {
-		if (clusterTransitionsBuildingTaskHost != null && clusterTransitions != null) {
+		if (clusterTransitions != null) {
 			transitionsAnimation.animate(clusterTransitions);
-			clusterTransitionsBuildingTaskHost = null;
-		} else if (clusterTransitionsBuildingTaskHost == null) {
-			clusterTransitionsBuildingTaskHost = new ClusterTransitionsBuildingTaskHost();
-			clusterTransitionsBuildingTaskHost.executeTask();
 		}
+		clusterTransitionsBuildingTaskHost = null;
+	}
+
+	private void startClusterTransitionsBuildingTask(Projection projection) {
+		clusterTransitionsBuildingTaskHost = new ClusterTransitionsBuildingTaskHost();
+		clusterTransitionsBuildingTaskHost.executeTask(projection);
+
+		clusteringTaskHost = null;
 	}
 
 	private void showAllClusters() {
@@ -429,7 +428,7 @@ public class Clusterkraf {
 		@Override
 		public void onClusteringTaskPostExecute(ClusteringTask.Result result) {
 			currentClusters = result.currentClusters;
-			onCurrentClustersSet();
+			onCurrentClustersSet(result);
 			task = null;
 		}
 
@@ -461,14 +460,14 @@ public class Clusterkraf {
 
 		}
 
-		abstract protected void onCurrentClustersSet();
+		abstract protected void onCurrentClustersSet(ClusteringTask.Result result);
 
 	}
 
 	private class ShowAllClustersClusteringTaskHost extends BaseClusteringTaskHost {
 
 		@Override
-		protected void onCurrentClustersSet() {
+		protected void onCurrentClustersSet(ClusteringTask.Result result) {
 			showAllClusters();
 		}
 	}
@@ -476,10 +475,9 @@ public class Clusterkraf {
 	private class UpdateClustersAndTransitionClusteringTaskHost extends BaseClusteringTaskHost {
 
 		@Override
-		protected void onCurrentClustersSet() {
-			updateClustersAndTransition();
+		protected void onCurrentClustersSet(ClusteringTask.Result result) {
+			startClusterTransitionsBuildingTask(result.projection);
 		}
-
 	}
 
 	private class ClusterTransitionsBuildingTaskHost implements ClusterTransitionsBuildingTask.Host {
@@ -508,13 +506,12 @@ public class Clusterkraf {
 		}
 
 		@SuppressLint("NewApi")
-		public void executeTask() {
-			GoogleMap map = mapRef.get();
-			if (map != null) {
+		public void executeTask(Projection projection) {
+			if (projection != null) {
 				ClusterTransitionsBuildingTask.Argument arg = new ClusterTransitionsBuildingTask.Argument();
 				arg.currentClusters = currentClusters;
 				arg.previousClusters = previousClusters;
-				arg.projection = map.getProjection();
+				arg.projection = projection;
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 					task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, arg);
 				} else {
