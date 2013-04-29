@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Clusterkraf Sample</string>
+    
+    <string name="mode_normal_label">Normal Mode</string>
+    <string name="mode_normal_start">Start Normal Mode</string>
+    
+    <string name="mode_advanced_label">Advanced Mode</string>
+    <string name="mode_advanced_start">Start Advanced Mode</string>
+    
+    <string-array name="modes_labels">
+        <item>@string/mode_normal_label</item>
+        <item>@string/mode_advanced_label</item>
+    </string-array>
+    
+    <string-array name="modes_start">
+        <item>@string/mode_normal_start</item>
+        <item>@string/mode_advanced_start</item>
+    </string-array>
+    
+    <string name="mode_descriptions">Start in Normal Mode to quickly try Clusterkraf, or check out Advanced Mode to see how each option affects the experience.</string>
+    
+    <string name="zoom_to_bounds">Zoom To Bounds</string>
+    <string name="show_info_window">Show Info Window</string>
+    <string name="no_op">No operation</string>
+    
+    <string name="advanced_points_geographic_distribution_label">Geographic Distribution of Randomized Points</string>
+    <string name="advanced_points_geographic_distribution_near_two_toasters">Near Two Toasters</string>
+    <string name="advanced_points_geographic_distribution_worldwide">Worldwide</string>
+    <string-array name="advanced_points_geographic_distribution_options">
+        <item>@string/advanced_points_geographic_distribution_near_two_toasters</item>
+        <item>@string/advanced_points_geographic_distribution_worldwide</item>
+    </string-array>
+    <string name="advanced_points_geographic_distribution_message">Controls where on the planet the random points will appear. Selecting "Near Two Toasters" will yield a higher concentration of points on screen when the camera is inside the appropriate bounds. Selecting "Worldwide" will yield a lower concentration in the same bounds, but we will let you choose a higher number of total points to demonstrate Clusterkraf\'s performance with large, geographically distributed data sets.</string>
+    
+    <string name="advanced_points_count_label">Points</string>
+    <string name="advanced_points_count_message">The total number of points to generate for clustering. Pro tip: if you select Worldwide Geographic Distribution of Randomized Points, we offer a higher number number of total points to demonstrate Clusterkraf\'s performance with large, geographically distributed data sets.</string>
+    
+    <string name="advanced_cluster_transition_animation_duration_label">Cluster Transition Animation Duration (ms)</string>
+    
+    <string name="advanced_cluster_transition_animation_interpolator_label">Cluster Transition Animation Interpolator</string>
+    
+    <string name="advanced_zoom_to_bounds_animation_duration_label">Zoom To Bounds Animation Duration (ms)</string>
+    
+    <string name="advanced_show_info_window_animation_duration_label">Show Info Window Animation Duration (ms)</string>
+    
+    <string name="advanced_pixel_distance_to_join_cluster_label">Distance To Join Cluster (dip)</string>
+    
+    <string name="advanced_expand_bounds_factor_label">Expand Bounds Factor (Overdraw)</string>
+    <string name="advanced_expand_bounds_factor_message">TODO: explanation</string>
+    
+    <string name="advanced_single_point_click_behavior_label">Single Point Click Behavior</string>
+    <string name="advanced_single_point_click_behavior_show_info_window">@string/show_info_window</string>
+    <string name="advanced_single_point_click_behavior_no_op">@string/no_op</string>
+    <string-array name="advanced_single_point_click_behavior_options">
+        <item>@string/advanced_single_point_click_behavior_show_info_window</item>
+        <item>@string/advanced_single_point_click_behavior_no_op</item>
+    </string-array>
+    
+    <string name="advanced_cluster_click_behavior_label">Cluster Click Behavior</string>
+    <string name="advanced_cluster_click_behavior_zoom_to_bounds">@string/zoom_to_bounds</string>
+    <string name="advanced_cluster_click_behavior_show_info_window">@string/show_info_window</string>
+    <string name="advanced_cluster_click_behavior_no_op">@string/no_op</string>
+    <string-array name="advanced_cluster_click_behavior_options">
+        <item>@string/advanced_cluster_click_behavior_zoom_to_bounds</item>
+        <item>@string/advanced_cluster_click_behavior_show_info_window</item>
+        <item>@string/advanced_cluster_click_behavior_no_op</item>
+    </string-array>
+    
+    <string name="advanced_cluster_info_window_click_behavior_label">Cluster Info Window Click Behavior</string>
+    <string name="advanced_cluster_info_window_click_behavior_zoom_to_bounds">@string/zoom_to_bounds</string>
+    <string name="advanced_cluster_info_window_click_behavior_no_op">@string/no_op</string>
+    <string-array name="advanced_cluster_info_window_click_behavior_options">
+        <item>@string/advanced_cluster_info_window_click_behavior_zoom_to_bounds</item>
+        <item>@string/advanced_cluster_info_window_click_behavior_no_op</item>
+    </string-array>
+    
+    <string-array name="advanced_labels">
+        <item>@string/advanced_points_geographic_distribution_label</item>
+        <item>@string/advanced_points_count_label</item>
+        <item>@string/advanced_cluster_transition_animation_duration_label</item>
+        <item>@string/advanced_cluster_transition_animation_interpolator_label</item>
+        <item>@string/advanced_zoom_to_bounds_animation_duration_label</item>
+        <item>@string/advanced_show_info_window_animation_duration_label</item>
+        <item>@string/advanced_pixel_distance_to_join_cluster_label</item>
+        <item>@string/advanced_expand_bounds_factor_label</item>
+        <item>@string/advanced_single_point_click_behavior_label</item>
+        <item>@string/advanced_cluster_click_behavior_label</item>
+        <item>@string/advanced_cluster_info_window_click_behavior_label</item>
+    </string-array>
+    
+    <string name="point_number_x">Point #%1$s</string>
+    <string name="including_two_toasters">%1$s (including Two Toasters)</string>
+    
+    <string name="two_toasters">Two Toasters</string>
+    <string name="two_toasters_heading">We design and develop iOS and Android apps.</string>
+    <string name="two_toasters_logo">Two Toasters Logo</string>    
+    <string name="two_toasters_url">www.twotoasters.com</string>
+
+</resources>
