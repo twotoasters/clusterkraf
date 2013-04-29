@@ -1,19 +1,16 @@
-Clusterkraf
-===========
+# Clusterkraf
 
 A clustering library for the Google Maps Android API v2.
 
-Features
-========
+## Features
 
 - Clustering based on pixel proximity, not grid membership
 - Animated cluster transitions
 - Supports Android v2.2 (Froyo) and higher
 
-Setup
-=====
+## Setup
 
-It's easy to add Clusterkraf to your app. We assume you have a data object that holds latitude and longitude coordinates of each point you want plotted on the map similar to this:
+It's easy to add Clusterkraf to your app. Add the Clusterkraf library folder as an Android project to your Eclipse/ADT workspace, and reference it from your app as a library project. Also, we assume you have a data object that holds latitude and longitude coordinates of each point you want plotted on the map similar to this:
 
 ```java
 public class YourMapPointModel {
@@ -59,10 +56,21 @@ When your `GoogleMap` is initialized and your `ArrayList<InputPoint>` is built, 
 
 You've added a really sweet clustered map to your Android app.
 
-For a more detailed example, including Activity lifecycle, custom marker icons, click handling, and demonstration of Clusterkraf's options, take a look at the included sample app's source code. You can build it yourself by just adding your Google Maps for Android v2 API key, or you can download it from Google Play at https://play.google.com/store/apps/details?id=com.twotoasters.clusterkraf.sample.
+For a more detailed example, take a look at the included sample app's source code. 
 
-License
-=======
+## Sample App
+
+The sample app demonstrates Activity lifecycle, custom marker icons, click handling, and Clusterkraf's options. You can build it from source, or install it from https://play.google.com/store/apps/details?id=com.twotoasters.clusterkraf.sample.
+
+### Building the Sample App
+
+1. in your local checkout of the Clusterkraf git repo, do `git submodule init` and `git submodule update`.
+2. Add sample/ as a new Android project from existing source.
+3. Add sample/libs/ViewPagerIndicator as a new Android project from existing source.
+4. Authorize com.twotoasters.clusterkraf.sample built with your key of choice to your Google Maps for Android v2 API account.
+5. Create a new Values file `private_strings.xml` in sample/res/values/ and create a string named `maps_api_key` with your Google Maps for Android v2 API key.
+
+## License
 
     Copyright 2013 Two Toasters
 
