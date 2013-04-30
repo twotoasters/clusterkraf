@@ -68,8 +68,6 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 		RandomPointsProvider rpp = RandomPointsProvider.getInstance();
 		ArrayList<InputPoint> inputPoints = rpp.getPoints();
 
-		setProgressBarIndeterminateVisibility(false);
-
 		if (savedInstanceState != null && inputPoints != null) {
 			this.restoreCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
 			this.inputPoints = inputPoints;
