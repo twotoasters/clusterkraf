@@ -433,6 +433,10 @@ public class Clusterkraf {
 		}
 
 		public void cancel() {
+			ProcessingListener processingListener = options.getProcessingListener();
+			if (processingListener != null) {
+				processingListener.onClusteringFinished();
+			}
 			task.cancel(true);
 			task = null;
 		}
@@ -468,6 +472,10 @@ public class Clusterkraf {
 
 		@Override
 		protected void onCurrentClustersSet(ClusteringTask.Result result) {
+			ProcessingListener processingListener = options.getProcessingListener();
+			if (processingListener != null) {
+				processingListener.onClusteringFinished();
+			}
 			showAllClusters();
 		}
 	}
