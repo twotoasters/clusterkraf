@@ -70,11 +70,10 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 		setTitle(getString(R.string.sample_activity, getString(titleFormatArg)));
 
 		RandomPointsProvider rpp = RandomPointsProvider.getInstance();
-		ArrayList<InputPoint> inputPoints = rpp.getPoints();
 
-		if (savedInstanceState != null && inputPoints != null) {
+		if (savedInstanceState != null && rpp.hasPoints()) {
 			this.restoreCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
-			this.inputPoints = inputPoints;
+			this.inputPoints = rpp.getPoints();
 		} else {
 			setProgressBarIndeterminateVisibility(true);
 
