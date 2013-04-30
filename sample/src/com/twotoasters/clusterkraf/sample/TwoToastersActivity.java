@@ -15,6 +15,7 @@ public class TwoToastersActivity extends FragmentActivity implements OnClickList
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setTitle(R.string.two_toasters);
 		setContentView(R.layout.activity_two_toasters);
 		View url = findViewById(R.id.two_toasters_url);
 		url.setOnClickListener(this);

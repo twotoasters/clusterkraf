@@ -54,16 +54,20 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 
 		setContentView(R.layout.activity_sample);
 
+		int titleFormatArg = 0;
 		Intent i = getIntent();
 		if (i != null) {
 			Object options = i.getSerializableExtra(EXTRA_OPTIONS);
 			if (options instanceof Options) {
 				this.options = (Options)options;
+				titleFormatArg = R.string.mode_advanced_label;
 			}
 		}
 		if (this.options == null) {
 			this.options = new Options();
+			titleFormatArg = R.string.mode_normal_label;
 		}
+		setTitle(getString(R.string.sample_activity, getString(titleFormatArg)));
 
 		RandomPointsProvider rpp = RandomPointsProvider.getInstance();
 		ArrayList<InputPoint> inputPoints = rpp.getPoints();
