@@ -24,6 +24,7 @@ class RandomPointsProvider {
 	}
 
 	void generate(GenerateCallback callback, GeographicDistribution geographicDistribution, int count) {
+		this.points = null;
 		this.generateCallback = new WeakReference<GenerateCallback>(callback);
 		new GenerateTask(geographicDistribution).execute(count);
 	}
@@ -37,6 +38,10 @@ class RandomPointsProvider {
 			}
 			generateCallback = null;
 		}
+	}
+
+	boolean hasPoints() {
+		return points != null;
 	}
 
 	ArrayList<InputPoint> getPoints() {

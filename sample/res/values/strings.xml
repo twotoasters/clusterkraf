@@ -90,6 +90,7 @@
         <item>@string/advanced_cluster_info_window_click_behavior_label</item>
     </string-array>
     
+    <string name="sample_activity">Sample Activity - %1$s</string>
     <string name="point_number_x">Point #%1$s</string>
     <string name="including_two_toasters">%1$s (including Two Toasters)</string>
     
