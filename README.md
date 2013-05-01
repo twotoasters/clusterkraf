@@ -22,7 +22,7 @@ public class YourMapPointModel {
 }
 ```
 
-Clusterkraf provides an `InputPoint` class which holds a `LatLng` position and an `Object` tag. You just need to construct an `ArrayList<InputPoint>` object based on your model objects similar to this example. In this example, we provide the model as the `Object` tag for the `InputPoint` so that we can later access it callbacks; see `MarkerOptionsChooser`, `OnInfoWindowClickDownstreamListener`, and `OnMarkerClickDownstreamListener`.
+Clusterkraf provides an `InputPoint` class which holds a `LatLng` position and an `Object` tag. You just need to construct an `ArrayList<InputPoint>` object based on your model objects similar to this example. In this example, we provide the model as the `Object` tag for the `InputPoint` so that we can later pass them back to you in callbacks as the `ClusterPoint` object's pointsInCluster list; see `MarkerOptionsChooser`, `OnInfoWindowClickDownstreamListener`, and `OnMarkerClickDownstreamListener`.
 
 ```java
 public class YourActivity extends FragmentActivity {
@@ -64,7 +64,7 @@ The sample app demonstrates Activity lifecycle, custom marker icons, click handl
 
 ### Building the Sample App
 
-1. in your local checkout of the Clusterkraf git repo, do `git submodule init` and `git submodule update`.
+1. In your local checkout of the Clusterkraf git repo, do `git submodule init` and `git submodule update`.
 2. Add sample/ as a new Android project from existing source.
 3. Add sample/libs/ViewPagerIndicator as a new Android project from existing source.
 4. Authorize com.twotoasters.clusterkraf.sample built with your key of choice to your Google Maps for Android v2 API account.
