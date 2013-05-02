@@ -92,7 +92,7 @@ public class ToastedMarkerOptionsChooser extends MarkerOptionsChooser {
 		}
 		Bitmap bitmap = BitmapFactory.decodeResource(res, resourceId, options);
 		if (bitmap.isMutable() == false) {
-			bitmap = bitmap.copy(bitmap.getConfig(), true);
+			bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
 		}
 
 		Canvas canvas = new Canvas(bitmap);
