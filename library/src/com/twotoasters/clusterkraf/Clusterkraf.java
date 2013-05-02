@@ -111,6 +111,21 @@ public class Clusterkraf {
 	 */
 	public void clear() {
 		/**
+		 * cancel the background thread clustering task
+		 */
+		if (clusteringTaskHost != null) {
+			clusteringTaskHost.cancel();
+			clusteringTaskHost = null;
+		}
+		/**
+		 * cancel the background thread transition building task
+		 */
+		if (clusterTransitionsBuildingTaskHost != null) {
+			clusterTransitionsBuildingTaskHost.cancel();
+			clusterTransitionsBuildingTaskHost = null;
+		}
+
+		/**
 		 * we avoid GoogleMap.clear() so users can manage their own
 		 * non-clustered markers on the map.
 		 * 
