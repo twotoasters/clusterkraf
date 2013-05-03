@@ -1,6 +1,6 @@
 package com.twotoasters.clusterkraf;
 
-import com.google.android.gms.maps.model.Marker;
+import com.cyrilmottier.polaris2.maps.model.Marker;
 
 /**
  * Because Clusterkraf must set its own OnMarkerClickListener on the GoogleMap

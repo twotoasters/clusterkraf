@@ -1,3 +1,6 @@
 [submodule "sample/libs/ViewPagerIndicator"]
 	path = sample/libs/ViewPagerIndicator
 	url = git@github.com:twotoasters/Android-ViewPagerIndicator.git
+[submodule "polaris2"]
+	path = polaris2
+	url = git@github.com:twotoasters/Polaris2.git

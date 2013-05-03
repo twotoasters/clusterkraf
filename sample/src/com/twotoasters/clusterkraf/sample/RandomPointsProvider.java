@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import android.os.AsyncTask;
 
-import com.google.android.gms.maps.model.LatLng;
+import com.cyrilmottier.polaris2.maps.model.LatLng;
 import com.twotoasters.clusterkraf.InputPoint;
 
 class RandomPointsProvider {

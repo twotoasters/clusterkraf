@@ -1,6 +1,6 @@
 package com.twotoasters.clusterkraf;
 
-import com.google.android.gms.maps.Projection;
+import com.cyrilmottier.polaris2.maps.Projection;
 
 /**
  * Models the animated transition of a cluster

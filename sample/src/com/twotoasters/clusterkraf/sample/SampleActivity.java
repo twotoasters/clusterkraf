@@ -13,12 +13,12 @@ import android.view.Window;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.CameraPosition;
+import com.cyrilmottier.polaris2.maps.CameraUpdateFactory;
+import com.cyrilmottier.polaris2.maps.GoogleMap;
+import com.cyrilmottier.polaris2.maps.GoogleMap.OnCameraChangeListener;
+import com.cyrilmottier.polaris2.maps.SupportMapFragment;
+import com.cyrilmottier.polaris2.maps.UiSettings;
+import com.cyrilmottier.polaris2.maps.model.CameraPosition;
 import com.twotoasters.clusterkraf.Clusterkraf;
 import com.twotoasters.clusterkraf.Clusterkraf.ProcessingListener;
 import com.twotoasters.clusterkraf.InputPoint;
@@ -131,7 +131,7 @@ public class SampleActivity extends FragmentActivity implements GenerateCallback
 		if (map == null) {
 			SupportMapFragment mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
 			if (mapFragment != null) {
-				map = mapFragment.getMap();
+				map = mapFragment.getPolarisMap();
 				if (map != null) {
 					UiSettings uiSettings = map.getUiSettings();
 					uiSettings.setAllGesturesEnabled(false);

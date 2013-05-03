@@ -4,8 +4,8 @@ import java.lang.ref.WeakReference;
 
 import android.graphics.Bitmap;
 
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.cyrilmottier.polaris2.maps.model.BitmapDescriptorFactory;
+import com.cyrilmottier.polaris2.maps.model.MarkerOptions;
 
 /**
  * Implementations specify the icon and any other options to use on a

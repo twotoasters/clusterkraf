@@ -9,15 +9,15 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.CancelableCallback;
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
-import com.google.android.gms.maps.Projection;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.cyrilmottier.polaris2.maps.CameraUpdate;
+import com.cyrilmottier.polaris2.maps.CameraUpdateFactory;
+import com.cyrilmottier.polaris2.maps.GoogleMap;
+import com.cyrilmottier.polaris2.maps.GoogleMap.CancelableCallback;
+import com.cyrilmottier.polaris2.maps.GoogleMap.OnInfoWindowClickListener;
+import com.cyrilmottier.polaris2.maps.GoogleMap.OnMarkerClickListener;
+import com.cyrilmottier.polaris2.maps.Projection;
+import com.cyrilmottier.polaris2.maps.model.Marker;
+import com.cyrilmottier.polaris2.maps.model.MarkerOptions;
 
 /**
  * Clusters InputPoint objects on a GoogleMap

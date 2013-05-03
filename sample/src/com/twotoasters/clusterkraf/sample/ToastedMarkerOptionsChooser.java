@@ -13,9 +13,9 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Build;
 
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.cyrilmottier.polaris2.maps.model.BitmapDescriptor;
+import com.cyrilmottier.polaris2.maps.model.BitmapDescriptorFactory;
+import com.cyrilmottier.polaris2.maps.model.MarkerOptions;
 import com.twotoasters.clusterkraf.ClusterPoint;
 import com.twotoasters.clusterkraf.InputPoint;
 import com.twotoasters.clusterkraf.MarkerOptionsChooser;

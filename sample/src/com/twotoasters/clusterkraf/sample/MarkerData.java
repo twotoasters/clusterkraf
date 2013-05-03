@@ -3,7 +3,7 @@ package com.twotoasters.clusterkraf.sample;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.android.gms.maps.model.LatLng;
+import com.cyrilmottier.polaris2.maps.model.LatLng;
 
 /**
  *

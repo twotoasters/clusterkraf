@@ -5,7 +5,7 @@ import java.lang.ref.WeakReference;
 import android.content.Context;
 import android.content.Intent;
 
-import com.google.android.gms.maps.model.Marker;
+import com.cyrilmottier.polaris2.maps.model.Marker;
 import com.twotoasters.clusterkraf.ClusterPoint;
 import com.twotoasters.clusterkraf.OnMarkerClickDownstreamListener;
 

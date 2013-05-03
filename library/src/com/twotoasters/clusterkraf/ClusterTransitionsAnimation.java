@@ -4,10 +4,10 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.cyrilmottier.polaris2.maps.GoogleMap;
+import com.cyrilmottier.polaris2.maps.model.LatLng;
+import com.cyrilmottier.polaris2.maps.model.Marker;
+import com.cyrilmottier.polaris2.maps.model.MarkerOptions;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.Animator.AnimatorListener;
 import com.nineoldandroids.animation.ObjectAnimator;
