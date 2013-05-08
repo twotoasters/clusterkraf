@@ -2,6 +2,8 @@
 
 A clustering library for the Google Maps Android API v2.
 
+If you're using the [Polaris v2](https://github.com/cyrilmottier/Polaris2) library, check out our [pleiades](https://github.com/twotoasters/clusterkraf/tree/pleiades) branch.
+
 ## Features
 
 - Clustering based on pixel proximity, not grid membership
