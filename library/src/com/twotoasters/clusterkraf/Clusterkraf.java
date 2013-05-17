@@ -359,28 +359,56 @@ public class Clusterkraf {
 				}
 				if (exempt == false && handled == false && clusterPoint != null) {
 					if (clusterPoint.size() > 1) {
-						switch(clusterkraf.options.getClusterClickBehavior()) {
-							case ZOOM_TO_BOUNDS:
-								clusterkraf.zoomToBounds(clusterPoint);
-								handled = true;
-								break;
-							case SHOW_INFO_WINDOW:
-								clusterkraf.showInfoWindow(marker, clusterPoint);
-								handled = true;
-								break;
-							case NO_OP:
-								// no-op
-								break;
+						if (marker.isInfoWindowShown()) {
+							switch(clusterkraf.options.getClusterInfoWindowShownClusterClickBehavior()) {
+								case ZOOM_TO_BOUNDS:
+									clusterkraf.zoomToBounds(clusterPoint);
+									handled = true;
+									break;
+								case HIDE_INFO_WINDOW:
+									marker.hideInfoWindow();
+									handled = true;
+									break;
+								case NO_OP:
+									// no-op
+									break;
+							}
+						} else {
+							switch(clusterkraf.options.getClusterClickBehavior()) {
+								case ZOOM_TO_BOUNDS:
+									clusterkraf.zoomToBounds(clusterPoint);
+									handled = true;
+									break;
+								case SHOW_INFO_WINDOW:
+									clusterkraf.showInfoWindow(marker, clusterPoint);
+									handled = false;
+									break;
+								case NO_OP:
+									// no-op
+									break;
+							}
 						}
 					} else {
-						switch(clusterkraf.options.getSinglePointClickBehavior()) {
-							case SHOW_INFO_WINDOW:
-								clusterkraf.showInfoWindow(marker, clusterPoint);
-								handled = true;
-								break;
-							case NO_OP:
-								// no-op
-								break;
+						if (marker.isInfoWindowShown()) {
+							switch(clusterkraf.options.getSinglePointInfoWindowShownPointClickBehavior()) {
+								case HIDE_INFO_WINDOW:
+									marker.hideInfoWindow();
+									handled = true;
+									break;
+								case NO_OP:
+									// no-op
+									break;
+							}
+						} else {
+							switch(clusterkraf.options.getSinglePointClickBehavior()) {
+								case SHOW_INFO_WINDOW:
+									clusterkraf.showInfoWindow(marker, clusterPoint);
+									handled = true;
+									break;
+								case NO_OP:
+									// no-op
+									break;
+							}
 						}
 					}
 				}

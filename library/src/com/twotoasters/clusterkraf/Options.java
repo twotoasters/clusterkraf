@@ -89,6 +89,11 @@ public class Options {
 	private ClusterInfoWindowClickBehavior clusterInfoWindowClickBehavior = ClusterInfoWindowClickBehavior.HIDE_INFO_WINDOW;
 
 	/**
+	 * The behavior when a cluster is clicked whose info window is shown
+	 */
+	private ClusterInfoWindowShownClusterClickBehavior clusterInfoWindowShownClusterClickBehavior = ClusterInfoWindowShownClusterClickBehavior.NO_OP;
+
+	/**
 	 * The behavior when a single point's marker is clicked
 	 */
 	private SinglePointClickBehavior singlePointClickBehavior = SinglePointClickBehavior.SHOW_INFO_WINDOW;
@@ -97,6 +102,11 @@ public class Options {
 	 * The behavior when a single point's info window is clicked
 	 */
 	private SinglePointInfoWindowClickBehavior singlePointInfoWindowClickBehavior = SinglePointInfoWindowClickBehavior.HIDE_INFO_WINDOW;
+
+	/**
+	 * The behavior when a single point is clicked whose info window is shown
+	 */
+	private SinglePointInfoWindowShownPointClickBehavior singlePointInfoWindowShownPointClickBehavior = SinglePointInfoWindowShownPointClickBehavior.NO_OP;
 
 	/**
 	 * How long the ClusteringOnCameraChangeListener should remain dirty. This
@@ -250,6 +260,21 @@ public class Options {
 	}
 
 	/**
+	 * @return the clusterInfoWindowShownClusterClickBehavior
+	 */
+	ClusterInfoWindowShownClusterClickBehavior getClusterInfoWindowShownClusterClickBehavior() {
+		return clusterInfoWindowShownClusterClickBehavior;
+	}
+
+	/**
+	 * @param clusterInfoWindowShownClusterClickBehavior
+	 *            the clusterInfoWindowShownClusterClickBehavior to set
+	 */
+	public void setClusterInfoWindowShownClusterClickBehavior(ClusterInfoWindowShownClusterClickBehavior clusterInfoWindowShownClusterClickBehavior) {
+		this.clusterInfoWindowShownClusterClickBehavior = clusterInfoWindowShownClusterClickBehavior;
+	}
+
+	/**
 	 * @return the zoomToBoundsPadding
 	 */
 	int getZoomToBoundsPadding() {
@@ -325,6 +350,21 @@ public class Options {
 	}
 
 	/**
+	 * @return the singlePointInfoWindowShownPointClickBehavior
+	 */
+	SinglePointInfoWindowShownPointClickBehavior getSinglePointInfoWindowShownPointClickBehavior() {
+		return singlePointInfoWindowShownPointClickBehavior;
+	}
+
+	/**
+	 * @param singlePointInfoWindowShownPointClickBehavior
+	 *            the singlePointInfoWindowShownPointClickBehavior to set
+	 */
+	public void setSinglePointInfoWindowShownPointClickBehavior(SinglePointInfoWindowShownPointClickBehavior singlePointInfoWindowShownPointClickBehavior) {
+		this.singlePointInfoWindowShownPointClickBehavior = singlePointInfoWindowShownPointClickBehavior;
+	}
+
+	/**
 	 * @return the clusteringOnCameraChangeListenerDirtyLifetimeMillis
 	 */
 	long getClusteringOnCameraChangeListenerDirtyLifetimeMillis() {
@@ -354,11 +394,19 @@ public class Options {
 		ZOOM_TO_BOUNDS, HIDE_INFO_WINDOW, NO_OP
 	}
 
+	public enum ClusterInfoWindowShownClusterClickBehavior {
+		NO_OP, HIDE_INFO_WINDOW, ZOOM_TO_BOUNDS
+	}
+
 	public enum SinglePointClickBehavior {
 		SHOW_INFO_WINDOW, NO_OP
 	}
 
 	public enum SinglePointInfoWindowClickBehavior {
 		HIDE_INFO_WINDOW, NO_OP
+	}
+
+	public enum SinglePointInfoWindowShownPointClickBehavior {
+		NO_OP, HIDE_INFO_WINDOW
 	}
 }
