@@ -6,6 +6,8 @@ A clustering library for [Polaris v2](https://github.com/cyrilmottier/Polaris2).
 
 Pleiades swaps the `com.google.android.gms.maps.*` references for `com.cyrilmottier.polaris2.maps.*` references, and makes other minor changes per the instructions on Cyril Mottier's [article](http://cyrilmottier.com/2013/05/02/enhancing-google-maps-api-v2-with-polaris-v2/) introducing it.
 
+If you're using the [Polaris v2](https://github.com/cyrilmottier/Polaris2) library, check out our [pleiades](https://github.com/twotoasters/clusterkraf/tree/pleiades) branch.
+
 ## Features
 
 - Clustering based on pixel proximity, not grid membership
