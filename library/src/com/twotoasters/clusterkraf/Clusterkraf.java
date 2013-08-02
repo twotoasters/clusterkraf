@@ -136,8 +136,13 @@ public class Clusterkraf {
 				marker.remove();
 			}
 		}
-		currentMarkers = null;
+		
+		currentClusters = null;
 		currentClusterPointsByMarker = null;
+		currentMarkers = null;
+		previousClusters = null;
+		previousMarkers = null;
+		
 		points.clear();
 	}
 
