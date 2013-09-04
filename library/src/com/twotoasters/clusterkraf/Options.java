@@ -59,6 +59,12 @@ public class Options {
 	 */
 	private OnInfoWindowClickDownstreamListener onInfoWindowClickDownstreamListener;
 
+    /**
+     * The InfoWindowDownstreamAdapter to receive callbacks when an info window
+     * needs to be displayed.
+     */
+    private InfoWindowDownstreamAdapter infoWindowDownstreamAdapter;
+
 	/**
 	 * When zooming to the bounds of a marker's backing ClusterPoint, zoom until
 	 * all of the points are at least this far from the edge of the GoogleMap's
@@ -219,7 +225,22 @@ public class Options {
 		this.onInfoWindowClickDownstreamListener = onInfoWindowClickDownstreamListener;
 	}
 
-	/**
+    /**
+     * @return the infoWindowDownstreamAdapter
+     */
+    public InfoWindowDownstreamAdapter getInfoWindowDownstreamAdapter() {
+        return this.infoWindowDownstreamAdapter;
+    }
+
+    /**
+     * @param infoWindowDownstreamAdapter
+     *            the infoWindowDownstreamAdapter to set
+     */
+    public void setInfoWindowDownstreamAdapter(InfoWindowDownstreamAdapter infoWindowDownstreamAdapter) {
+        this.infoWindowDownstreamAdapter = infoWindowDownstreamAdapter;
+    }
+
+    /**
 	 * @return the clusterClickBehavior
 	 */
 	ClusterClickBehavior getClusterClickBehavior() {
