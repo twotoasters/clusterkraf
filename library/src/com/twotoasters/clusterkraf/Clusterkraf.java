@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 
+import android.view.View;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -62,6 +63,7 @@ public class Clusterkraf {
 			map.setOnCameraChangeListener(innerCallbackListener.clusteringOnCameraChangeListener);
 			map.setOnMarkerClickListener(innerCallbackListener);
 			map.setOnInfoWindowClickListener(innerCallbackListener);
+            map.setInfoWindowAdapter(innerCallbackListener);
 		}
 
 		showAllClusters();
@@ -265,7 +267,7 @@ public class Clusterkraf {
 	}
 
 	private static class InnerCallbackListener implements ClusteringOnCameraChangeListener.Host, ClusterTransitionsAnimation.Host, OnMarkerClickListener,
-			OnInfoWindowClickListener {
+			OnInfoWindowClickListener, GoogleMap.InfoWindowAdapter {
 
 		private final WeakReference<Clusterkraf> clusterkrafRef;
 
@@ -435,7 +437,43 @@ public class Clusterkraf {
 			}
 
 		}
-	}
+
+        /**
+         * @see com.google.android.gms.maps.GoogleMap.InfoWindowAdapter
+         *      getInfoWindow(com.google.android.gms.maps.model.Marker)
+         */
+        @Override
+        public View getInfoWindow(Marker marker) {
+            View infoWindow = null;
+            Clusterkraf clusterkraf = clusterkrafRef.get();
+            if (clusterkraf != null) {
+                ClusterPoint clusterPoint = clusterkraf.currentClusterPointsByMarker.get(marker);
+                InfoWindowDownstreamAdapter infoWindowDownstreamAdapter = clusterkraf.options.getInfoWindowDownstreamAdapter();
+                if (infoWindowDownstreamAdapter != null) {
+                    infoWindow = infoWindowDownstreamAdapter.getInfoWindow(marker, clusterPoint);
+                }
+            }
+            return infoWindow; // Google Map will handle it when null
+        }
+
+        /**
+         * @see com.google.android.gms.maps.GoogleMap.InfoWindowAdapter
+         *      getInfoContents(com.google.android.gms.maps.model.Marker)
+         */
+        @Override
+        public View getInfoContents(Marker marker) {
+            View infoWindow = null;
+            Clusterkraf clusterkraf = clusterkrafRef.get();
+            if (clusterkraf != null) {
+                ClusterPoint clusterPoint = clusterkraf.currentClusterPointsByMarker.get(marker);
+                InfoWindowDownstreamAdapter infoWindowDownstreamAdapter = clusterkraf.options.getInfoWindowDownstreamAdapter();
+                if (infoWindowDownstreamAdapter != null) {
+                    infoWindow = infoWindowDownstreamAdapter.getInfoContents(marker, clusterPoint);
+                }
+            }
+            return infoWindow; // Google Map will handle it when null
+        }
+    }
 
 	abstract private class BaseClusteringTaskHost implements ClusteringTask.Host {
 
