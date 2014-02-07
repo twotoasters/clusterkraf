@@ -1,0 +1,3 @@
+include ':sample:libs:ViewPagerIndicator:library'
+include ':sample'
+include ':library'
