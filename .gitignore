@@ -30,6 +30,3 @@ gen-external-apklibs
 # Gradle
 .gradle
 build
-gradle
-gradlew
-gradlew.bat
