@@ -12,6 +12,28 @@ If you're using the [Polaris v2](https://github.com/cyrilmottier/Polaris2) libra
 
 ## Setup
 
+### Gradle
+
+If you are using Gradle just add the following to your build.gradle file:
+
+```groovy
+dependencies {
+    compile 'com.twotoasters.clusterkraf:library:1.0.+'
+}
+```
+
+### Maven
+
+If you are using maven add the following to your pom file:
+```xml
+<dependency>
+    <groupId>com.twotoasters.clusterkraf</groupId>
+    <artifactId>library</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+### Eclipse
 It's easy to add Clusterkraf to your app. Add the Clusterkraf library folder as an Android project to your Eclipse/ADT workspace, and reference it from your app as a library project. Also, we assume you have a data object that holds latitude and longitude coordinates of each point you want plotted on the map similar to this:
 
 ```java
