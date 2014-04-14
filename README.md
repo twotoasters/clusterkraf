@@ -29,7 +29,7 @@ If you are using maven add the following to your pom file:
 <dependency>
     <groupId>com.twotoasters.clusterkraf</groupId>
     <artifactId>library</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
